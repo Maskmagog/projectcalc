@@ -1,0 +1,107 @@
+Install everything from scratch:
+
+Download latest Raspbian: Stretch Lite https://www.raspberrypi.org/downloads/raspbian/
+Get Etcher, transfer img to sdhc card https://www.balena.io/etcher/
+To activate ssh: Create an empty file named 'ssh' (no extension) and save it to root partition, in the root of the sdhc card.
+
+(If you need wifi, create a textfile 'wpasupplicant.conf' with network id, passwd etc)
+
+insert sdhc card, plugin ethernet to router, power on
+find ip, login pi/raspberry  
+run command 'sudo raspi-config'. Change password, and expand filesystem (advanced options/expand filesystem)
+reboot, login
+
+install following packages:
+sudo apt-get update
+sudo apt-get install mono-complete -y (to run .NET exe's)
+sudo apt-get install apache2 -y (https://www.raspberrypi.org/documentation/remote-access/web-server/apache.md)
+sudo apt-get install python-bs4 (beautifulsoup, scraper library used by scraper) 
+sudo apt-get -y install python-mysql.connector
+sudo apt-get install mariadb-server -y 
+setup database, follow instructions (https://howtoraspberrypi.com/mariadb-raspbian-raspberry-pi/)
+
+****** DATABASE **********
+create database pcarsdb;
+create a database user and set password: https://mariadb.com/kb/en/library/create-user/
+create user pcars identified by '<yourpassword>';
+GRANT USAGE ON *.* TO 'pcars'@'%' IDENTIFIED BY '<yourpassword>';
+GRANT ALL PRIVILEGES ON  *.* to 'pcars'@'%' WITH GRANT OPTION;
+
+create table laptimes ( id INT NOT NULL AUTO_INCREMENT, gamertag VARCHAR(64), vehicle VARCHAR(64), vehicleclass VARCHAR(64), track(VARCHAR(64), laptime FLOAT(16,3), sector1 FLOAT(16,3), sector2 FLOAT(16,3), sector3 FLOAT(16,3), lapdate DATETIME, sessionmode VARCHAR(20), validlap VARCHAR(1), tracktemp INT, ambtemp INT, raindensity INT, PRIMARY KEY ( id ));
+(https://www.tutorialspoint.com/mariadb/mariadb_create_tables.htm)
+command 'desc laptimes' (to see the columns)
+create unique index uniquelaps on laptimes(track,vehicle,gamertag,laptime); //Stops duplicates with INSERT IGNORE used by python script
+
+create another table, used by php page:
+create table cartrackdb(id INT, currentvehicle VARCHAR(64), currenttrack VARCHAR(64));
+
+create another table that keeps track of username:
+create table user (id INT, username VARCHAR(64));
+you maybe need to add your gamertag manually the first time
+('sudo mysql -p', enter password, then 'use pcarsdb')
+insert into user(id, username) VALUES(1,'yourgamertag')
+(this can certainly be done from the pc2udp script, checking if it's empty first, not sure how it works right now)
+
+****** PC2UDP *********
+visual studio
+open project pc2udp
+add reference mysql.data
+change db password if needed (several places)
+build pc2udp, found in bin/release 
+copy folder pc2udp to /home/pi/
+library written by Zeratall, modified by me.
+
+to get it to autostart after reboots, start it as a service.
+create the file with the following command: sudo nano /etc/systemd/system/pc2udp.service
+Then paste the following, and press 'ctrl x' to save the file.
+------------------------------
+[Unit]
+Description=pc2udp
+# If the service relies on network uncomment the next line.
+After=network.target
+
+[Service]
+Type=Simple
+ExecStart=/usr/bin/mono /home/pi/pc2udp/pc2udp.exe
+
+[Install]
+WantedBy=multi-user.target
+-------------------------
+Then enter following commands:
+sudo systemctl enable pc2udp
+sudo systemctl daemon-reload
+sudo systemctl start pc2udp
+
+To see the status and latest console outout, enter:
+sudo systemctl status pc2udp
+
+
+****** PC2SCRAPER ******
+open pc2scraper.py with for example Notepad++
+Add the cars/tracks you want by copying the entire row, excluding #, to either customtracks or customvehicles (lines 147 & 148). 
+Keep the {} outside , and set a comma between different additions.
+copy folder pc2scraper to /home/pi/
+make python script executable
+chmod +x /home/pi/pc2scraper/pc2scraper.py
+to run scraper:
+sudo python /home/pi/pc2scraper/pc2scraper.py
+written by jonas gulle, modified by me.
+hopefully sit back and watch the magic. 
+
+********* PC2PHP ************
+install php:
+sudo apt-get install php7.0
+sudo apt-get install libapache2-mod-php
+sudo apt-get install php php-mbstring
+sudo apt-get install php-mysql phpmyadmin
+
+to get access to /var/www/html, run:
+sudo chmod -R 755 /var/www/html
+copy folder pc2php to /var/www/html/
+
+find ip, browse to <ip>/index.php
+
+
+
+
+

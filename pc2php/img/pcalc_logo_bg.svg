@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.5 r10040"
+   width="900"
+   height="900"
+   sodipodi:docname="pcalc_logo_bg.png"
+   enable-background="new">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1296"
+     inkscape:window-height="689"
+     id="namedview4"
+     showgrid="false"
+     inkscape:zoom="0.48510813"
+     inkscape:cx="772.55196"
+     inkscape:cy="460.99843"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer2" />
+  <metadata
+     id="metadata8">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs6">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3212">
+      <stop
+         style="stop-color:#999999;stop-opacity:1;"
+         offset="0"
+         id="stop3214" />
+      <stop
+         style="stop-color:#999999;stop-opacity:0;"
+         offset="1"
+         id="stop3216" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3212"
+       id="linearGradient3218"
+       x1="496.79645"
+       y1="992.76282"
+       x2="463.81412"
+       y2="-699.64337"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.99835515,0,0,1.0520161,0.05349019,-23.068035)" />
+    <filter
+       inkscape:collect="always"
+       id="filter3244">
+      <feBlend
+         inkscape:collect="always"
+         mode="multiply"
+         in2="BackgroundImage"
+         id="feBlend3246" />
+    </filter>
+    <filter
+       x="0"
+       y="0"
+       width="1"
+       height="1"
+       inkscape:label="Duotone"
+       inkscape:menu="Color"
+       inkscape:menu-tooltip="Change colors to a duotone palette"
+       color-interpolation-filters="sRGB"
+       id="filter3323">
+      <feFlood
+         result="result1"
+         flood-opacity="0"
+         flood-color="rgb(128,128,128)"
+         id="feFlood3325" />
+      <feBlend
+         mode="normal"
+         in2="SourceGraphic"
+         result="result2"
+         id="feBlend3327" />
+      <feComposite
+         k2="1"
+         operator="arithmetic"
+         in2="SourceGraphic"
+         id="feComposite3329" />
+      <feComposite
+         operator="in"
+         in2="SourceGraphic"
+         id="feComposite3331"
+         result="fbSourceGraphic" />
+      <feColorMatrix
+         result="fbSourceGraphicAlpha"
+         in="fbSourceGraphic"
+         values="0 0 0 -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1 0"
+         id="feColorMatrix3333" />
+      <feFlood
+         id="feFlood3335"
+         result="result1"
+         flood-opacity="0"
+         flood-color="rgb(128,128,128)"
+         in="fbSourceGraphic" />
+      <feBlend
+         id="feBlend3337"
+         in2="fbSourceGraphic"
+         mode="normal"
+         result="result2" />
+      <feComposite
+         id="feComposite3339"
+         in2="fbSourceGraphic"
+         k2="1"
+         operator="arithmetic"
+         result="result3" />
+      <feComposite
+         id="feComposite3341"
+         in2="fbSourceGraphic"
+         operator="in"
+         result="fbSourceGraphic" />
+      <feColorMatrix
+         result="fbSourceGraphicAlpha"
+         in="fbSourceGraphic"
+         values="0 0 0 -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1 0"
+         id="feColorMatrix3343" />
+      <feColorMatrix
+         id="feColorMatrix3345"
+         type="saturate"
+         values="0"
+         result="result1"
+         in="fbSourceGraphic" />
+      <feFlood
+         id="feFlood3347"
+         flood-color="rgb(9,111,152)"
+         result="result4" />
+      <feBlend
+         id="feBlend3349"
+         in2="result1"
+         mode="screen"
+         result="result2" />
+      <feComposite
+         id="feComposite3351"
+         in2="fbSourceGraphic"
+         operator="in"
+         in="result2" />
+    </filter>
+  </defs>
+  <path
+     style="fill:url(#linearGradient3218);fill-opacity:1;stroke:#000000;stroke-width:5.57026911;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+     d="m -16.353859,459.37748 0,-482.76987 475.311829,0 475.31195,0 0,482.76987 0,482.76981 -475.31195,0 -475.311829,0 0,-482.76981 z"
+     id="path3158"
+     inkscape:connector-curvature="0" />
+  <flowRoot
+     xml:space="preserve"
+     id="flowRoot3003"
+     style="font-size:40px;font-style:normal;font-variant:normal;font-weight:900;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial Black;-inkscape-font-specification:'Arial Black, Heavy'"
+     transform="matrix(7.6941748,0,0,3.2056683,-46.557099,-11.408879)"><flowRegion
+       id="flowRegion3005"><rect
+         id="rect3007"
+         width="124.26272"
+         height="40.084747"
+         x="4.737288"
+         y="1.8220339"
+         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:900;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;font-family:Arial Black;-inkscape-font-specification:'Arial Black, Heavy'" /></flowRegion><flowPara
+       id="flowPara3009">CALC</flowPara></flowRoot>  <g
+     inkscape:groupmode="layer"
+     id="layer1"
+     inkscape:label="Layer" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="Layer#2"
+     style="opacity:0.51388891;display:none">
+    <image
+       width="1032.1937"
+       height="798.51544"
+       xlink:href="data:image/png;base64,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 rkJggg== "
+       id="image10"
+       x="-72.896744"
+       y="120.41467"
+       style="filter:url(#filter3323)" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Layer#1"
+     style="opacity:0.18055556;display:inline;filter:url(#filter3244)">
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1.20000005000000010;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3248"
+       width="1008.0227"
+       height="1010.084"
+       x="-43.289318"
+       y="-35.873817" />
+  </g>
+</svg>
