@@ -14,6 +14,8 @@ This runs on the Pi:
 On the Pi you need to install php7, MariaDB, Apache2, Mono.
 To edit the UDP program, you need Visual Studio.
 
+Set Project CARS 2 to output UDP in PC2 format (version 2).
+
 The .NET program receives and interprets various UDP data from the game. Thank you Zeratall for the library, and all the help! It checks for your current lap record for the car-track combo you are currently running. You could set it to record all laps, or just laps that are valid, or just laps in Time Trial, or whatever you want. Store the data you want. Track temp? Ride height? Tyre temps? Rain density?
 
 The database stores everything, and you could use that data anyway you want. It's a MariaDB, very similar to MySQL, and easy to use.
