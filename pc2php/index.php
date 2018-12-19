@@ -8,6 +8,7 @@ session_start(); // Start php session to keep session variables
 <head>
 <title>Project CALC - Community Assisted Leaderboards for Consoles - Project CARS 2</title>
 <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon"> 
+<link href="https://fonts.googleapis.com/css?family=VT323" rel="stylesheet">
 <style>
 <?php include 'main.css';?> 
 </style>
@@ -26,7 +27,7 @@ echo "<div id='wrapper'>";
 //**********************	
 $host ="127.0.0.1"; //Don't use localhost for some reason
 $user = "pcars";
-$pass = "<insertyourpassword>";
+$pass = "PG3Dnq4m2BVFaaLC";
 $db = "pcarsdb";
 $mysqli = new mysqli($host,$user,$pass,$db);
 /* check connection */
@@ -159,6 +160,10 @@ while ($row = $result->fetch_assoc()) {  /* fetch the results into an array */
 $stmt->close();
 echo "</select></div>";
 
+if (!empty($_GET['carselect'])) {
+	$carselect = $_GET['carselect'];
+}	
+
 // Buttons for selecting AllTopTimes, TopPersonalTimes or AllPersonalTimes (in different div tags)						
 echo "<div class='button1'><button name='lbselect' type='submit' value='AllTopTimes'>Show leaderboard</button></div>
 <div class='button2'><button name='lbselect' type='submit' value='TopPersonalTimes'>Top personal laps</button>
@@ -167,13 +172,16 @@ echo "<div class='button1'><button name='lbselect' type='submit' value='AllTopTi
 
 
 //************************
-// Search for playername *
+// Search for playername * - NOT WORKING?
 //************************
-echo "<div class='search'><form name='player' class='search' METHOD='GET' ACTION='player.php'><input type='text' width='100' name='player' placeholder='search for player'>
-<input type='submit' value='Submit'></form</div>";
-if (!empty($_GET['carselect'])) {
-	$carselect = $_GET['carselect'];
-}	
+echo "<div class='search'><form name='player' METHOD='POST' ACTION='player.php?player='><input type='text' width='100' name='player' placeholder='search for player'>";
+echo "<input type='submit' value='Submit'></form</div>";
+
+ if (isset($_POST['player'])) {
+     $_POST['player'] = strip_tags($_POST['player']);
+}
+
+
 	
 
 // Get username: Prepare sql statement, bind parameters, fetch data 
@@ -342,7 +350,7 @@ echo "<table width=100% border=0 color=#000000 cellpadding='5' cellspacing='5' i
 <th>Date</th>
 <th><span class='tooltip'>S<span class='tooltiptext'>Setup</span></span></th>
 <th><span class='tooltip'>C<span class='tooltiptext'>Controller</span></span></th>
-<th>PF</th>
+<th><span class='tooltip'>P<span class='tooltiptext'>Platform</span></span></th>
 </tr>
 </thead>
 <tbody>";
@@ -475,9 +483,7 @@ echo "<td>" . substr($row['controller'],0,1) . "</td>";
 echo "<td>" . $row['platform'] . "</td>";
 echo "</tr>";
 }
-echo "</tbody></table>";    
-//echo "sess track select " . $_SESSION['trackselect'];
-//echo "sess car select " . $_SESSION['carselect'];
+echo "</tbody></table>";  
 //*********************
 // Display pagination *
 //*********************

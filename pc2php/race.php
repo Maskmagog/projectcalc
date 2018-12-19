@@ -23,7 +23,7 @@ echo "<div id='racemodewrapper'>";
 //**********************	
 $host ="127.0.0.1"; //Don't use localhost for some reason
 $user = "pcars";
-$pass = "<insertyourpassword>";
+$pass = "PG3Dnq4m2BVFaaLC";
 $db = "pcarsdb";
 $mysqli = new mysqli($host,$user,$pass,$db);
 /* check connection */
@@ -319,7 +319,7 @@ if ($_POST['autoupdate'] == 'Autoupdate off') {
 echo "<span style='color:#ffffff'>Autoupdate is " . $_SESSION['autoupdate'] . "</span></span>";
 
 // Set nr of rivals
-echo "<span class='setrivalnr'><form name='setrivalnr' METHOD='POST' ACTION='race.php'><input type='text' name='setrivalnr' size=1><button type='submit'>Set nr of rivals</button></form>";
+echo "<span class='setrivalnr'><form name='setrivalnr' METHOD='POST' ACTION='race.php'><input type='number' name='setrivalnr' min='0' max='19'><button type='submit'>Set nr of rivals</button></form>";
 if (isset($_POST['setrivalnr'])) {
     $_SESSION['rivalnr'] = $_POST['setrivalnr'];
 	echo "<meta http-equiv='refresh' content='0'>";
