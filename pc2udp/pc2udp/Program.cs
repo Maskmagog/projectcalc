@@ -34,7 +34,7 @@ namespace pc2udp
         private static double FastestLapTimeSec = 0;
         private static double dbLapRecord = 0;
         private static string AllTimeRecord = "N";
-        public static string VehicleNameSub;
+        public static string VehicleName;
         public static string strSessionMode;
         public static char CurrGameState;
         public static char CurrSessionState;
@@ -46,7 +46,7 @@ namespace pc2udp
         public static string FullTrackLocation;
         public static double RainDensity;
         public static string OldFullTrackLocation = "Unknown";
-        public static string OldVehicleNameSub = "Unknown";
+        public static string OldVehicleName = "Unknown";
         public static double OldLapTimeSec = 0;
 
         public static void resetValues()
@@ -65,7 +65,7 @@ namespace pc2udp
             AllTimeRecord = "N";
             TrackLocation = "";
             FullTrackLocation = "";
-            VehicleNameSub = "";
+            VehicleName = "";
         }
 
         //************************************
@@ -74,7 +74,7 @@ namespace pc2udp
         public static void dbupdate()
         {
             // DATABASE CONNECTION
-            string connStr = "server=127.0.0.1;user=pcars;database=pcarsdb;port=3306;password=<insertyourpassword>"; // Change this to your values. 127.0.0.1 = localhost
+            string connStr = "server=127.0.0.1;user=pcars;database=pcarsdb;port=3306;password=PG3Dnq4m2BVFaaLC"; // Change this to your values. 127.0.0.1 = localhost
             MySqlConnection conn = new MySqlConnection(connStr);
             try
             {
@@ -83,15 +83,15 @@ namespace pc2udp
                 conn.Open();
 
                 // INSERT
-                var commandText = "INSERT INTO laptimes(gamertag, track, vehicle, vehicleclass, laptime, sector1, sector2, sector3, tracktemp, ambtemp, raindensity, sessionmode, validlap, lapdate, platform)" + " VALUES(?gamertag, ?track, ?vehicle, ?vehicleclass, ?laptime, ?sector1, ?sector2, ?sector3, ?tracktemp, ?ambtemp, ?raindensity, ?sessionmode, ?validlap, ?lapdate, ?platform)";
+                var commandText = "INSERT INTO laptimes(gamertag, track, vehicle, vehicleclass, laptime, sector1, sector2, sector3, tracktemp, ambtemp, raindensity, sessionmode, validlap, lapdate, platform, setup, controller, camera)" + " VALUES(?gamertag, ?track, ?vehicle, ?vehicleclass, ?laptime, ?sector1, ?sector2, ?sector3, ?tracktemp, ?ambtemp, ?raindensity, ?sessionmode, ?validlap, ?lapdate, ?platform, ?setup, ?controller, ?camera)";
                 var command = new MySqlCommand(commandText, conn);
                 command.Parameters.Add("?gamertag", MySqlDbType.VarChar, 64).Value = Name;
                 command.Parameters.Add("?track", MySqlDbType.VarChar, 64).Value = FullTrackLocation;
-                command.Parameters.Add("?vehicle", MySqlDbType.VarChar, 64).Value = VehicleNameSub;
+                command.Parameters.Add("?vehicle", MySqlDbType.VarChar, 64).Value = VehicleName;
                 command.Parameters.Add("?vehicleclass", MySqlDbType.VarChar, 64).Value = "Class"; // Not functioning right now
                 command.Parameters.Add("?laptime", MySqlDbType.Double).Value = LastLapTimeSec;
                 Console.WriteLine("----Session lap record? " + SessionLapRecord);
-                Console.WriteLine(Name + FullTrackLocation + VehicleNameSub + LastLapTimeSec + LastLapValid);
+                Console.WriteLine(Name + FullTrackLocation + VehicleName + LastLapTimeSec + LastLapValid);
                 if (SessionLapRecord == "Y" && LastLapValid == "Y") // LastSectorTimes is sometimes wrong (not stored directly by game). If it's a session record, use FastestSectorTimes instead.
                 {
                     command.Parameters.Add("?sector1", MySqlDbType.Double).Value = FastestSector1TimeSec;
@@ -111,6 +111,9 @@ namespace pc2udp
                 command.Parameters.Add("?validlap", MySqlDbType.VarChar, 1).Value = LastLapValid;
                 command.Parameters.Add("?lapdate", MySqlDbType.DateTime).Value = DateTime.Now;
                 command.Parameters.Add("?platform", MySqlDbType.VarChar, 3).Value = "XB1";
+                command.Parameters.Add("?setup", MySqlDbType.VarChar, 8).Value = "Default";
+                command.Parameters.Add("?controller", MySqlDbType.VarChar, 8).Value = "Wheel";
+                command.Parameters.Add("?camera", MySqlDbType.VarChar, 8).Value = "In-car";
                 command.ExecuteNonQuery();
                 Console.WriteLine("***********NEW LAPTIME ADDED TO DATABASE***************");
             }
@@ -130,7 +133,7 @@ namespace pc2udp
         public static void dbfetchrecord()
         {
             // DATABASE CONNECTION
-            string connStr = "server=127.0.0.1;user=pcars;database=pcarsdb;port=3306;password=<insertyourpassword>"; // Change this to your values. 127.0.0.1 = localhost
+            string connStr = "server=127.0.0.1;user=pcars;database=pcarsdb;port=3306;password=PG3Dnq4m2BVFaaLC"; // Change this to your values. 127.0.0.1 = localhost
             MySqlConnection conn = new MySqlConnection(connStr);
             try
             {
@@ -139,7 +142,7 @@ namespace pc2udp
                 conn.Open();
 
                 // Perform database operations, TODO change to parameterized
-                string commandText = "SELECT laptime FROM laptimes WHERE gamertag='" + Name + "' AND vehicle='" + VehicleNameSub + "' AND track='" + FullTrackLocation + "' ORDER BY laptime ASC LIMIT 1";
+                string commandText = "SELECT laptime FROM laptimes WHERE gamertag='" + Name + "' AND vehicle='" + VehicleName + "' AND track='" + FullTrackLocation + "' ORDER BY laptime ASC LIMIT 1";
 
                 MySqlCommand command = new MySqlCommand(commandText, conn);
                 string strdbLapRecord = command.ExecuteScalar().ToString();
@@ -163,7 +166,7 @@ namespace pc2udp
         public static void dbUsername()
         {
             // DATABASE CONNECTION
-            string connStr = "server=127.0.0.1;user=pcars;database=pcarsdb;port=3306;password=<insertyourpassword>"; // Change this to your values. 127.0.0.1 = localhost
+            string connStr = "server=127.0.0.1;user=pcars;database=pcarsdb;port=3306;password=PG3Dnq4m2BVFaaLC"; // Change this to your values. 127.0.0.1 = localhost
             MySqlConnection conn = new MySqlConnection(connStr);
             try
             {
@@ -195,7 +198,7 @@ namespace pc2udp
         public static void dbCurrentCarTrack()
         {
             // DATABASE CONNECTION
-            string connStr = "server=127.0.0.1;user=pcars;database=pcarsdb;port=3306;password=P<insertyourpassword>"; // Change this to your values. 127.0.0.1 = localhost
+            string connStr = "server=127.0.0.1;user=pcars;database=pcarsdb;port=3306;password=PG3Dnq4m2BVFaaLC"; // Change this to your values. 127.0.0.1 = localhost
             MySqlConnection conn = new MySqlConnection(connStr);
             try
             {
@@ -203,14 +206,14 @@ namespace pc2udp
                 // Open connection to db
                 conn.Open();
 
-                var cmdUser = "UPDATE cartrackdb SET currenttrack = '" + FullTrackLocation + "', currentvehicle = '" + VehicleNameSub + "' WHERE id=1"; //Only 1 row in this db, that changes when player changes car/track in-game
+                var cmdUser = "UPDATE cartrackdb SET currenttrack = '" + FullTrackLocation + "', currentvehicle = '" + VehicleName + "' WHERE id=1"; //Only 1 row in this db, that changes when player changes car/track in-game
                 Console.WriteLine("cmdUser " + cmdUser);
                 var command = new MySqlCommand(cmdUser, conn);
 
                 command.ExecuteNonQuery();
                 Console.WriteLine("******NEW CAR - TRACK ADDED TO DATABASE*******");
                 OldFullTrackLocation = FullTrackLocation;
-                OldVehicleNameSub = VehicleNameSub;
+                OldVehicleName = VehicleName;
             }
             catch (Exception ex)
             {
@@ -274,28 +277,29 @@ namespace pc2udp
                 // Do a if else
                 // If (ClassName = bunch of classes) {SubIndex = 1}
                 //else { SubIndex = 2}
-                // use SubIndex in SubString
+                // then use SubIndex in SubString (instead of '2')
 
-                if (uDP.VehicleName != null)
+                if (uDP.VehicleIndex == 132) { VehicleName = "Ginetta G40 GT5"; } // For some reason, uDP.VehicleName is blank for this car
+
+                if (uDP.VehicleName != null && VehicleName != "Ginetta G40 GT5")
                 {
                     //Console.WriteLine("VehicleName is " + VehicleName);
-                    VehicleNameSub = ((uDP.VehicleName).Substring(2));
+                    VehicleName = ((uDP.VehicleName).Substring(2));
                     //Console.WriteLine("VehicleNameSub is " + VehicleNameSub);
                 }
 
                 //Correct naming errors in vehicles and tracks
-                if (uDP.VehicleIndex == 132) { VehicleNameSub = "Ginetta G40 GT5"; }
-                if (VehicleNameSub == "orsche 917/10") { VehicleNameSub = "Porsche 917/10"; }
-                if (VehicleNameSub == "ormula Renault 3.5") { VehicleNameSub = "Formula Renault 3.5"; }
-                if (VehicleNameSub == "allara IR-12 Chevrolet (Speedway)") { VehicleNameSub = "Dallara IR-12 Chevrolet (Speedway)"; }
-                if (VehicleNameSub == "allara IR-12 Chevrolet (Road Course)") { VehicleNameSub = "Dallara IR-12 Chevrolet (Road)"; }
-                if (VehicleNameSub == "MW 2002 Turbo") { VehicleNameSub = "BMW 2002 Turbo"; }
-                if (VehicleNameSub == "ord Escort RS1600") { VehicleNameSub = "Ford Escort RS1600"; }
-                if (VehicleNameSub == "ercedes-AMG A 45 SMS-R Touring") { VehicleNameSub = "Mercedes-AMG A 45 SMS-R Touring"; }
-                if (VehicleNameSub == "MW 320 TC (E90)") { VehicleNameSub = "BMW 320 TC (E90)"; }
-                if (VehicleNameSub == "errari 488 Challenge (EU)") { VehicleNameSub = "Ferrari 488 Challenge (EU)"; }
-                if (VehicleNameSub == "adical SR3-RS") { VehicleNameSub = "Radical SR3-RS"; }
-                if (VehicleNameSub == "enault Clio Cup") { VehicleNameSub = "Renault Clio Cup"; }
+                if (VehicleName == "orsche 917/10") { VehicleName = "Porsche 917/10"; }
+                if (VehicleName == "ormula Renault 3.5") { VehicleName = "Formula Renault 3.5"; }
+                if (VehicleName == "allara IR-12 Chevrolet (Speedway)") { VehicleName = "Dallara IR-12 Chevrolet (Speedway)"; }
+                if (VehicleName == "allara IR-12 Chevrolet (Road Course)") { VehicleName = "Dallara IR-12 Chevrolet (Road)"; }
+                if (VehicleName == "MW 2002 Turbo") { VehicleName = "BMW 2002 Turbo"; }
+                if (VehicleName == "ord Escort RS1600") { VehicleName = "Ford Escort RS1600"; }
+                if (VehicleName == "ercedes-AMG A 45 SMS-R Touring") { VehicleName = "Mercedes-AMG A 45 SMS-R Touring"; }
+                if (VehicleName == "MW 320 TC (E90)") { VehicleName = "BMW 320 TC (E90)"; }
+                if (VehicleName == "errari 488 Challenge (EU)") { VehicleName = "Ferrari 488 Challenge (EU)"; }
+                if (VehicleName == "adical SR3-RS") { VehicleName = "Radical SR3-RS"; }
+                if (VehicleName == "enault Clio Cup") { VehicleName = "Renault Clio Cup"; }
                 if (FullTrackLocation == "SUGO GP") { FullTrackLocation = "Sportsland SUGO"; }
                 if (FullTrackLocation == "Laguna Seca") { FullTrackLocation = "Mazda Raceway Laguna Seca"; }
                 if (FullTrackLocation == "Snetterton 100_Circuit") { FullTrackLocation = "Snetterton 100"; }
@@ -315,11 +319,11 @@ namespace pc2udp
                 //************************************************************************************************************
                 //If car or track has changed - update table cartrackdb with currentrack and currentcar so php page can change
                 //************************************************************************************************************
-                if ((VehicleNameSub != null && FullTrackLocation != null) && (VehicleNameSub != OldVehicleNameSub || FullTrackLocation != OldFullTrackLocation))
+                if ((VehicleName != null && FullTrackLocation != null) && (VehicleName != OldVehicleName || FullTrackLocation != OldFullTrackLocation))
                 {
                     Console.WriteLine("Trying to send new car-track to db.");
                     Console.WriteLine("Current track is " + FullTrackLocation);
-                    Console.WriteLine("Current vehicle is " + VehicleNameSub);
+                    Console.WriteLine("Current vehicle is " + VehicleName);
                     dbCurrentCarTrack();
                 }
 
