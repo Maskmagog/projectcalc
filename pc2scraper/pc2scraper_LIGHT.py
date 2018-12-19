@@ -97,16 +97,19 @@ class ProjectCARS2(object):
 			global setup
 			setup = tr.find('td', {'class': 'assists'}).img.get('alt')
 			setup = setup[7:]
+			print setup
 			
 			#Get controller: Wheel, Gamepad or Keyboard
 			global controller
 			controller = tr.findAll('img')[2]['title']
 			controller = controller[12:]
-				
+			print controller
+			
 			#Get camera: In-car or External
 			global camera
 			camera = tr.findAll('img')[3]['title']
 			camera = camera[8:]
+			print camera
 			
 			leaderboard.append({
 				"rank": get_td(tr, "rank").text,
@@ -162,14 +165,13 @@ def main():
 	pc2 = ProjectCARS2()
 	
 	# Download the complete leaderboard for selected entries
-	customtracks = {("Rallycross of Loheac","3696088069"),("Rouen Les Essarts Short","2779493388"),("Willow Springs International Raceway","4191654388"),("Circuit of the Americas GP","2050315946"),("Long Beach Street Circuit","1731699995"),("Ruapuna Park Club","1446378877"),("DirtFish Boneyard Course","980779751"),("Daytona International Speedway Tri-Oval","2054003546"),("Daytona Road Course","467707118"),("Snetterton 300","1508903068"),("Ruapuna Park GP","1277693448"),("Snetterton 200","1058872832"),("Indianapolis Motor Speedway Oval","62242453"),("Hockenheim Short","1768660198"),("Hockenheim GP","1695182971"),("Hockenheim Classic GP","1552853772"),("Barcelona Rallycross","1828877100"),("24 Hours of Le Mans Circuit","1740968730"),("Zolder","3934256239"),("Watkins Glen International Short","1590386668"),("Sonoma Raceway National","3299764567"),("Sonoma Raceway GP","2840687665"),("Silverstone Classic GP","3100676468"),("Sakitto Sprint","3415685177"),("Sakitto National","3034141030"),("Sakitto GP","2535224250"),("Road America","3634666530"),("Rouen Les Essarts","3263717367"),("Red Bull Ring National","2280743555"),("Red Bull Ring GP","2361713765"),("Porsche Leipzig Full Circuit","4136123652"),("Oulton Park Island","2417267773"),("Nurburgring Nordschleife","697498609"),("Nurburgring GP","3348999902"),("Mugello GP","1730519219"), ("Lankebanen Rallycross","2087662703"),("Le Mans Vintage Track","167552033"),("Knockhill Rallycross","977699253"),("Knockhill National","1887425815"),("Knockhill International","2168579513"),("DirtFish Mill Run Course","2600030656"),("Classic Brands Hatch Rallycross","2239809056"),("Circuit de Spa-Francorchamps Historic","2490004715"),("Circuit de Spa-Francorchamps GP","904625875"),("Circuit de Barcelona-Catalunya GP","521933422"),("Brno GP","3387066030"),("Autodromo Nazionale Monza GP","4241994684"),("Autodromo Internazionale Enzo E Dino Ferrari Imola","920145926"),("Brands Hatch Indy", "1300627020"),("Brands Hatch GP", "1988984740"),("Autodromo Internacional do Algarve", "3878349996"),("Bannochbrae Road Circuit", "3692283027"),("Mazda Raceway Laguna Seca", "2682943968"),("Oulton Park Fosters", "2273942801"),("Sportsland SUGO", "3270746104"),("Watkins Glen International GP", "2509185801"),("Oulton Park International", "545979690")}
-	customvehicles = {("Lotus Type 78 Cosworth","2459105748"),("Porsche 919 Hybrid","3076484049"),("Ford Escort RS1600 (Racing)","3679780595"),("Ford Escort RS1600","1639105598"),("Ford Escort RS1600 (Rallycross)","2498018106"),("Ferrari 488 Challenge (EU)","1471547500"),("Dallara IR-12 Chevrolet (Speedway)","1818067169"),("Dallara IR-12 Chevrolet (Road)","3912454102"),("Toyota GT-One (1999)","3924299245"),("Ferrari 330 P4","3959862335"), ("BMW 320 TC","9503224"),("Radical SR8-RX","152867459"),("Mercedes-Benz SLS AMG GT3","274862187"),("Mercedes-Benz 190E 2.5-16 Evolution 2 DTM","262982797"),("Ferrari F40 LM","1015579264"),("Mercedes-AMG A 45 SMS-R Touring","3019822479"),("Ginetta G40 GT5","58065064"),("BMW M6 GT3","4053780148"),("BMW 320 Turbo Group 5","779111340"),("KTM X-Bow R","761457895"),("Porsche 924 Carrera GTP","4083384819"),("Toyota TS050 Hybrid","1083119012"),("Renault Alpine A442B","3595323626"),("Porsche Cayman GT4 Clubsport MR","1464988033"),("Porsche 962C","957632269"),("Porsche 917K","2459830780"),("Porsche 917 LH","2765703167"),("Olsbergs MSE RX Supercar Lite","3715710369"),("Mercedes-Benz 300 SEL 6.8 AMG","4209306796"),("Lotus Type 49C Cosworth","1061494025"),("Lamborghini Huracan GT3","4201933325"),("Jaguar E-Type V12 Group44","3289024725"),("Jaguar XJ220 S","3907921441"),("Ginetta LMP3","3671020568"),("Formula Rookie","2219682419"),("Formula Renault 3.5","1626504761"),("Ford Mustang '66 RTR TransAm","3921573780"),("Ford MkIV","2520631554"),("Ford GT LM GTE","2438214702"),("Ferrari F355 Challenge","2574370663"),("Ferrari 512 M","2463819442"),("Ferrari 488 GTE","405826415"),("Ferrari 488 GT3","185812116"),("Ferrari 458 Speciale A","2006190056"),("Ferrari 250 GT Berlinetta","3889953946"),("Chevrolet Camaro Z/28 '69 TransAm","728095309"),("Audi V8 quattro DTM","3954590596"),("Aston Martin DB11","2991153806"),("Acura NSX GT3","3416883430"),("BMW 2002 StanceWorks Edition", "3107219035"),("Audi R8 LMS", "1934199723"),("BMW 2002 Turbo", "143364290"),("BMW M1 Procar", "1368036017"),("Ginetta G40 Junior", "310900789"),("Renault Clio Cup", "3646257473"),("Radical SR3-RS", "1231996358"),("Ginetta G55 GT4", "2091910841"),("BAC Mono", "1400443574"),("Porsche 911 Carrera RSR 2.8", "3487780088")}
-	# To add laptimes for a new car, uncomment and change the 2 row(s) below, so no need to rescrape everything. Same can be done for a new track.
-	# customtracks = {} 
-	# customvehicles = {("Audi R18 (Le Mans 2016)","4054224091")}
-	
-	# lb = pc2.get_leaderboard(1988984740, 1639105598) # NOT USED
-	# pc2.store_leaderboard(lb) # NOT USED
+	# customtracks = {("Watkins Glen International GP","2509185801"),("Brands Hatch Indy","1300627020"),("Oulton Park International","545979690"),("Sportsland SUGO","3270746104"),("Nurburgring Nordschleife","697498609")}
+	# customvehicles = {("BMW 2002 StanceWorks Edition","3107219035"),("Ginetta G40 Junior","310900789"),("Radical SR3-RS","1231996358"),("Ford MkIV","2520631554"),("Lamborghini Huracan GT3","4201933325"),("Formula Renault 3.5","1626504761"), }
+	# To add laptimes for a new car, uncomment and change row(s) below, so no need to rescrape everything. Same can be done for a new track.
+	customtracks = {("Azure Circuit","832629329")} 
+	customvehicles = {("Formula Renault 3.5","1626504761")}
+	# lb = pc2.get_leaderboard(832629329, 2520631554)
+	# pc2.store_leaderboard(lb)
 	
 	# Loop through each car for first track, then 2nd track and so on
 	for track_name, track_id in customtracks:
@@ -318,7 +320,7 @@ if __name__ == "__main__":
 # ("Oulton Park Fosters","2273942801"),
 # ("Oulton Park International","545979690"),
 # ("Oulton Park Island","2417267773"),
-# ("Pista di Fiorano","1371913179"),
+# ("Pista di Fiorano","1371913179"),	
 # ("Porsche Leipzig Dynamic Circuit","4189064524"),
 # ("Porsche Leipzig Full Circuit","4136123652"),
 # ("Porsche Leipzig Short Circuit","169281142"),
