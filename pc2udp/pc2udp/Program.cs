@@ -10,6 +10,13 @@ namespace pc2udp
 {
     class Program
     {
+        // db variables
+        public static string Server = "127.0.0.1";
+        public static string User = "pcars";
+        public static string Database = "pcarsdb";
+        public static int Port = 3306;       
+        public static string Pass = "PG3Dnq4m2BVFaaLC";
+
         // Declare variables to send to db
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
         private static string Name = "";
@@ -74,7 +81,7 @@ namespace pc2udp
         public static void dbupdate()
         {
             // DATABASE CONNECTION
-            string connStr = "server=127.0.0.1;user=pcars;database=pcarsdb;port=3306;password=PG3Dnq4m2BVFaaLC"; // Change this to your values. 127.0.0.1 = localhost
+            string connStr = String.Format("server={0}; user={1}; database={2}; port={3}; password={4}", Server, User, Database, 3306, Pass);
             MySqlConnection conn = new MySqlConnection(connStr);
             try
             {
@@ -133,7 +140,7 @@ namespace pc2udp
         public static void dbfetchrecord()
         {
             // DATABASE CONNECTION
-            string connStr = "server=127.0.0.1;user=pcars;database=pcarsdb;port=3306;password=PG3Dnq4m2BVFaaLC"; // Change this to your values. 127.0.0.1 = localhost
+            string connStr = String.Format("server={0}; user={1}; database={2}; port={3}; password={4}", Server, User, Database, 3306, Pass);
             MySqlConnection conn = new MySqlConnection(connStr);
             try
             {
@@ -166,7 +173,8 @@ namespace pc2udp
         public static void dbUsername()
         {
             // DATABASE CONNECTION
-            string connStr = "server=127.0.0.1;user=pcars;database=pcarsdb;port=3306;password=PG3Dnq4m2BVFaaLC"; // Change this to your values. 127.0.0.1 = localhost
+            string connStr = String.Format("server={0}; user={1}; database={2}; port={3}; password={4}", Server, User, Database, 3306, Pass);
+
             MySqlConnection conn = new MySqlConnection(connStr);
             try
             {
@@ -198,7 +206,7 @@ namespace pc2udp
         public static void dbCurrentCarTrack()
         {
             // DATABASE CONNECTION
-            string connStr = "server=127.0.0.1;user=pcars;database=pcarsdb;port=3306;password=PG3Dnq4m2BVFaaLC"; // Change this to your values. 127.0.0.1 = localhost
+            string connStr = String.Format("server={0}; user={1}; database={2}; port={3}; password={4}", Server, User, Database, 3306, Pass);
             MySqlConnection conn = new MySqlConnection(connStr);
             try
             {
