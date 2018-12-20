@@ -16,7 +16,7 @@ session_start(); // Start php session to keep session variables
 <body>
 <!-- Tablesorter script -->
 <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
-<script src="tablesorter/jquery.tablesorter.min.js"></script>
+<script src="tablesorter/jquery.tablesorter.min.js"></script> 
 
 <?php
 // Wrapper class to control page width etc. See main.css
@@ -167,23 +167,14 @@ if (!empty($_GET['carselect'])) {
 // Buttons for selecting AllTopTimes, TopPersonalTimes or AllPersonalTimes (in different div tags)						
 echo "<div class='button1'><button name='lbselect' type='submit' value='AllTopTimes'>Show leaderboard</button></div>
 <div class='button2'><button name='lbselect' type='submit' value='TopPersonalTimes'>Top personal laps</button>
-<button name='lbselect' type='submit' value='AllPersonalTimes'>All personal laps</button</form></div>";
-
-
+<button name='lbselect' type='submit' value='AllPersonalTimes'>All personal laps</button></form></div>";
 
 //************************
 // Search for playername * - NOT WORKING?
 //************************
-echo "<div class='search'><form name='player' METHOD='POST' ACTION='player.php?player='><input type='text' width='100' name='player' placeholder='search for player'>";
-echo "<input type='submit' value='Submit'></form</div>";
-
- if (isset($_POST['player'])) {
-     $_POST['player'] = strip_tags($_POST['player']);
-}
-
-
+echo "<div class='search'><form action='/player.php' method='get'><input type='text' name='player' size='10' placeholder='search for player'><input type='submit' value='Search'>
+</form></div>";
 	
-
 // Get username: Prepare sql statement, bind parameters, fetch data 
 $id = 1; // Only 1 record in this table, namely the username
 $stmt = $mysqli->prepare("SELECT username FROM user WHERE id = ?"); // Player gamertag is stored in table user with id=1. Set from pc2udp script, which reads the gamertag from UDP
@@ -505,6 +496,5 @@ $("#sortTable").tablesorter();
 </script>
 <span class="footer">This page is not affiliated with Slightly Mad Studios.</span>
 </div>
-
 </body>
 </html>

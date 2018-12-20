@@ -34,7 +34,7 @@ function convertTo($init)
 /* Connect to database */	
 $host ="127.0.0.1";
 $user = "pcars";
-$pass = "<insertyourpassword>";
+$pass = "PG3Dnq4m2BVFaaLC";
 $db = "pcarsdb";
 $mysqli = new mysqli($host,$user,$pass,$db);
 /* check connection */

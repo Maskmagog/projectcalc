@@ -6,7 +6,6 @@ session_start();?>
 <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon"> 
 <style>
 <?php include 'main.css';?>
-<?php include 'MyFontsWebfontsKit.css';?>
 </style>
 <meta http-equiv='refresh' content='15'>
 </head>
@@ -267,7 +266,7 @@ echo "<div class='racepage' id='racepageid'>";
 echo "<table id='racingtable' class='racingtable'>
 <tr>
 <td width='8%' align='right'>1. </td>
-<td width='52%'><div class='racepagename'>" . $worldrecordholder . "</div></td>
+<td><div class='racepagename'>" . $worldrecordholder . "</div></td>
 <td width='20%'>" . convertTo($worldrecord) . "</td>
 <td width='20%'align='right'>" . convertToGap($wrdiff) . "</td>
 </tr>";
