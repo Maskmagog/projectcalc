@@ -3,6 +3,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using System.Runtime.InteropServices;
 
@@ -250,35 +251,35 @@ namespace pc2udp
             // MAIN LOOP
             while (true)
             {
-                //Thread.Sleep(20);
-                uDP.readPackets(); //Read Packets ever loop iteration
+            //Thread.Sleep(20);
+            uDP.readPackets(); //Read Packets ever loop iteration
 
 
-                /* Do some testing to detect session restarts. maybe a function to reset values */
-                /*if (strRaceMode == "Not Started") {
-                    resetValues();
-                    Console.WriteLine("Session restart/new session? Values reset.");
-                } */
+            /* Do some testing to detect session restarts. maybe a function to reset values */
+            /*if (strRaceMode == "Not Started") {
+                resetValues();
+                Console.WriteLine("Session restart/new session? Values reset.");
+            } */
 
-                //****************************
-                //Track Location (if not null)
-                //****************************
-                if (uDP._TrackLocation != null)
-                {
-                    TrackLocation = uDP.TrackLocation;
-                    //Console.WriteLine("Track location is " + TrackLocation);
-                    string TrackLocation2 = TrackLocation.Replace("_", " ");
+            //****************************
+            //Track Location (if not null)
+            //****************************
+            if (uDP._TrackLocation != null)
+            {
+                TrackLocation = uDP.TrackLocation;
+                //Console.WriteLine("Track location is " + TrackLocation);
+                string TrackLocation2 = TrackLocation.Replace("_", " ");
 
-                    //Track Variation
-                    TrackVariation = uDP.TrackVariation;
-                    //Console.WriteLine("Track variation is " + TrackVariation);
+                //Track Variation
+                TrackVariation = uDP.TrackVariation;
+                //Console.WriteLine("Track variation is " + TrackVariation);
 
-                    // Concatenate tracklocation2 and trackvariation 
-                    FullTrackLocation = TrackLocation2 + " " + TrackVariation;
-                    //Console.WriteLine("FullTrackLocation is " + FullTrackLocation);
-                }
+                // Concatenate tracklocation2 and trackvariation 
+                FullTrackLocation = TrackLocation2 + " " + TrackVariation;
+                //Console.WriteLine("FullTrackLocation is " + FullTrackLocation);
+            }
 
-                //************************************************************
+            //************************************************************
                 // Vehicle name and class id
                 //************************************************************
                 //Certain classes only have one character ahead of name
@@ -287,27 +288,33 @@ namespace pc2udp
                 //else { SubIndex = 2}
                 // then use SubIndex in SubString (instead of '2')
 
+                int SubIndex = 2;
+                if (uDP.VehicleClass != 0 && uDP.VehicleName != null)
+                {
+                    var list = new List<uint> { 3357278208, 151060480, 2156134400, 1158676480, 3747282944, 2585198592, 409534464, 3673882624, 1859780608, 2841116672, 349979920};
+                    var exists = list.Contains(uDP.VehicleClass);
+
+                    if (exists == true)
+                    {
+                        SubIndex = 1;
+                    }
+                }
                 if (uDP.VehicleIndex == 132) { VehicleName = "Ginetta G40 GT5"; } // For some reason, uDP.VehicleName is blank for this car
 
                 if (uDP.VehicleName != null && VehicleName != "Ginetta G40 GT5")
                 {
-                    //Console.WriteLine("VehicleName is " + VehicleName);
-                    VehicleName = ((uDP.VehicleName).Substring(2));
-                    //Console.WriteLine("VehicleNameSub is " + VehicleNameSub);
+                //Console.WriteLine("VehicleName is " + VehicleName);
+                VehicleName = ((uDP.VehicleName).Substring(SubIndex));
+                Console.WriteLine("ClassINdex is " + uDP.VehicleClass);
+                //Console.WriteLine("VehicleNameSub is " + VehicleNameSub);
                 }
 
                 //Correct naming errors in vehicles and tracks
-                if (VehicleName == "orsche 917/10") { VehicleName = "Porsche 917/10"; }
-                if (VehicleName == "ormula Renault 3.5") { VehicleName = "Formula Renault 3.5"; }
-                if (VehicleName == "allara IR-12 Chevrolet (Speedway)") { VehicleName = "Dallara IR-12 Chevrolet (Speedway)"; }
-                if (VehicleName == "allara IR-12 Chevrolet (Road Course)") { VehicleName = "Dallara IR-12 Chevrolet (Road)"; }
-                if (VehicleName == "MW 2002 Turbo") { VehicleName = "BMW 2002 Turbo"; }
-                if (VehicleName == "ord Escort RS1600") { VehicleName = "Ford Escort RS1600"; }
-                if (VehicleName == "ercedes-AMG A 45 SMS-R Touring") { VehicleName = "Mercedes-AMG A 45 SMS-R Touring"; }
-                if (VehicleName == "MW 320 TC (E90)") { VehicleName = "BMW 320 TC (E90)"; }
-                if (VehicleName == "errari 488 Challenge (EU)") { VehicleName = "Ferrari 488 Challenge (EU)"; }
-                if (VehicleName == "adical SR3-RS") { VehicleName = "Radical SR3-RS"; }
-                if (VehicleName == "enault Clio Cup") { VehicleName = "Renault Clio Cup"; }
+                if (VehicleName == "RenaultMeganeRSSMSRTouring") { VehicleName = "Renault Mégane R.S. SMS-R Touring";}
+                if (VehicleName == "RenaultMeganeTrophyV6") { VehicleName = "Renault Mégane Trophy V6"; }
+                if (VehicleName == "LamborghiniHuracanLP6202SuperTrofeo") { VehicleName = "Lamborghini Huracán Super Trofeo"; }
+                if (VehicleName == "BMW1SeriesMCoupeStanceWorksEdition") { VehicleName = "BMW 1 Series M Coupe StanceWorks Edition"; }
+                if (VehicleName == "Honda24Concept") { VehicleName = "Honda 2&4 Concept"; }
                 if (FullTrackLocation == "SUGO GP") { FullTrackLocation = "Sportsland SUGO"; }
                 if (FullTrackLocation == "Laguna Seca") { FullTrackLocation = "Mazda Raceway Laguna Seca"; }
                 if (FullTrackLocation == "Snetterton 100_Circuit") { FullTrackLocation = "Snetterton 100"; }
@@ -329,9 +336,9 @@ namespace pc2udp
                 //************************************************************************************************************
                 if ((VehicleName != null && FullTrackLocation != null) && (VehicleName != OldVehicleName || FullTrackLocation != OldFullTrackLocation))
                 {
-                    Console.WriteLine("Trying to send new car-track to db.");
-                    Console.WriteLine("Current track is " + FullTrackLocation);
-                    Console.WriteLine("Current vehicle is " + VehicleName);
+                   Console.WriteLine("Trying to send new car-track to db.");
+                   Console.WriteLine("Current track is " + FullTrackLocation);
+                   Console.WriteLine("Current vehicle is " + VehicleName);
                     dbCurrentCarTrack();
                 }
 
