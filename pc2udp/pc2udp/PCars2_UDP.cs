@@ -585,9 +585,9 @@ namespace PcarsUDP
             stream.Position = 12;
 
             ClassIndex = binaryReader.ReadUInt32();
-            byte[] arrClassName = binaryReader.ReadBytes(64);
-            int lengthOfarrClassName = Array.IndexOf(arrClassName, (byte)0); // e.g. 4 for "clip\0"
-            ClassName = System.Text.UTF8Encoding.Default.GetString(arrClassName, 0, lengthOfarrClassName);
+            byte[] arrayClassName = binaryReader.ReadBytes(64);
+            int lengthOfarrayClassName = Array.IndexOf(arrayClassName, (byte)0); // e.g. 4 for "clip\0"
+            ClassName = System.Text.UTF8Encoding.Default.GetString(arrayClassName, 0, lengthOfarrayClassName);
             //Console.WriteLine("ClassName from PCars2_UDP.cs" + ClassName);
             //Console.WriteLine("ClassIndex from PCars2_UDP.cs" + ClassIndex);
         }
@@ -599,9 +599,9 @@ namespace PcarsUDP
 
             VehicleIndex = binaryReader.ReadUInt16();
             VehicleClass = binaryReader.ReadUInt32();
-            byte[] arrVehicleName = binaryReader.ReadBytes(64);
-            int lengthOfarrVehicleName = Array.IndexOf(arrVehicleName, (byte)0); // e.g. 4 for "clip\0"
-            VehicleName = System.Text.UTF8Encoding.Default.GetString(arrVehicleName, 0, lengthOfarrVehicleName);
+            byte[] arrayVehicleName = binaryReader.ReadBytes(64);
+            int lengthOfarrayVehicleName = Array.IndexOf(arrayVehicleName, (byte)0); // e.g. 4 for "clip\0"
+            VehicleName = System.Text.UTF8Encoding.Default.GetString(arrayVehicleName, 0, lengthOfarrayVehicleName);
             //Console.WriteLine("VehicleName from PCars2_UDP.cs" + VehicleName);
         }
 
@@ -612,9 +612,9 @@ namespace PcarsUDP
 
             VehicleIndex = binaryReader.ReadUInt16();
             VehicleClass = binaryReader.ReadUInt32();
-            byte[] arrVehicleName = binaryReader.ReadBytes(64);
-            int lengthOfarrVehicleName = Array.IndexOf(arrVehicleName, (byte)0); // e.g. 4 for "clip\0"
-            VehicleName = System.Text.UTF8Encoding.Default.GetString(arrVehicleName, 0, lengthOfarrVehicleName);
+            byte[] arrayVehicleName = binaryReader.ReadBytes(64);
+            int lengthOfarrayVehicleName = Array.IndexOf(arrayVehicleName, (byte)0); // e.g. 4 for "clip\0"
+            VehicleName = System.Text.UTF8Encoding.Default.GetString(arrayVehicleName, 0, lengthOfarrayVehicleName);
             //Console.WriteLine("VehicleNameData2 " + VehicleName);
         }
 

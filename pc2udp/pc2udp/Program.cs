@@ -12,7 +12,7 @@ namespace pc2udp
     class Program
     {
         // db variables
-        public static string Server = "127.0.0.1";
+        public static string Server = "127.0.0.1";    // don't use 'localhost' for some reason
         public static string User = "pcars";
         public static string Database = "pcarsdb";
         public static int Port = 3306;       
@@ -49,14 +49,16 @@ namespace pc2udp
         public static double RaceState;
         public static string strRaceMode;
         public static char CurrRaceState;
-        public static string CurrentValidLap;
+        public static string CurrentLapValid;
         public static string LastLapValid;
         public static string FullTrackLocation;
         public static double RainDensity;
-        public static string OldFullTrackLocation = "Unknown";
-        public static string OldVehicleName = "Unknown";
+        public static string OldFullTrackLocation = "";
+        public static string OldVehicleName = "";
         public static double OldLapTimeSec = 0;
         public static int a = 0;
+        public static int ValuesReset = 0;
+
 
         public static void resetValues()
         {
@@ -72,15 +74,14 @@ namespace pc2udp
             dbLapRecord = 0;
             SessionLapRecord = "N";
             AllTimeRecord = "N";
-            TrackLocation = "";
-            FullTrackLocation = "";
-            VehicleName = "";
+            LastLapValid = "Y";
+            CurrentLapValid = "Y";
         }
 
         //************************************
         // Inserts new laptimes into database
         //************************************
-        public static void dbupdate()
+        public static void dbSendLapToDb()
         {
             // DATABASE CONNECTION
             string connStr = String.Format("server={0}; user={1}; database={2}; port={3}; password={4}", Server, User, Database, 3306, Pass);
@@ -99,20 +100,9 @@ namespace pc2udp
                 command.Parameters.Add("?vehicle", MySqlDbType.VarChar, 64).Value = VehicleName;
                 command.Parameters.Add("?vehicleclass", MySqlDbType.VarChar, 64).Value = "Class"; // Not functioning right now
                 command.Parameters.Add("?laptime", MySqlDbType.Double).Value = LastLapTimeSec;
-                Console.WriteLine("----Session lap record? " + SessionLapRecord);
-                Console.WriteLine(Name + FullTrackLocation + VehicleName + LastLapTimeSec + LastLapValid);
-                //if (SessionLapRecord == "Y" && LastLapValid == "Y") // LastSectorTimes is sometimes wrong (not stored directly by game). If it's a session record, use FastestSectorTimes instead.
-                //{
-                //    command.Parameters.Add("?sector1", MySqlDbType.Double).Value = FastestSector1TimeSec;
-                //    command.Parameters.Add("?sector2", MySqlDbType.Double).Value = FastestSector2TimeSec;
-                //    command.Parameters.Add("?sector3", MySqlDbType.Double).Value = FastestSector3TimeSec;
-                //}
-                //else
-                //{
-                    command.Parameters.Add("?sector1", MySqlDbType.Double).Value = LastSector1TimeSec;
-                    command.Parameters.Add("?sector2", MySqlDbType.Double).Value = LastSector2TimeSec;
-                    command.Parameters.Add("?sector3", MySqlDbType.Double).Value = LastSector3TimeSec;
-                //}
+                command.Parameters.Add("?sector1", MySqlDbType.Double).Value = LastSector1TimeSec;
+                command.Parameters.Add("?sector2", MySqlDbType.Double).Value = LastSector2TimeSec;
+                command.Parameters.Add("?sector3", MySqlDbType.Double).Value = LastSector3TimeSec;
                 command.Parameters.Add("?tracktemp", MySqlDbType.Int16).Value = TrackTemp;
                 command.Parameters.Add("?ambtemp", MySqlDbType.Int16).Value = AmbTemp;
                 command.Parameters.Add("?raindensity", MySqlDbType.Double).Value = RainDensity;
@@ -124,6 +114,8 @@ namespace pc2udp
                 command.Parameters.Add("?controller", MySqlDbType.VarChar, 8).Value = "Wheel";
                 command.Parameters.Add("?camera", MySqlDbType.VarChar, 8).Value = "In-car";
                 command.ExecuteNonQuery();
+                Console.WriteLine("----Session lap record? " + SessionLapRecord);
+                Console.WriteLine(Name + FullTrackLocation + VehicleName + LastLapTimeSec + LastLapValid);
                 Console.WriteLine("***********NEW LAPTIME ADDED TO DATABASE***************");
                 Console.WriteLine("S1 = " + LastSector1TimeSec);
                 Console.WriteLine("S2 = " + LastSector2TimeSec);
@@ -142,7 +134,7 @@ namespace pc2udp
         //************************************
         // Getting records from the database
         //************************************
-        public static void dbfetchrecord()
+        public static void dbFetchRecord()
         {
             // DATABASE CONNECTION
             string connStr = String.Format("server={0}; user={1}; database={2}; port={3}; password={4}", Server, User, Database, 3306, Pass);
@@ -187,7 +179,7 @@ namespace pc2udp
                 // Open connection to db
                 conn.Open();
 
-                var cmdUser = "UPDATE user SET username = '" + Name + "' WHERE id=1";
+                var cmdUser = "UPDATE user SET username = '" + Name + "' WHERE id=1"; // Only one record in this db, to keep track of player name
                 Console.WriteLine("cmdUser " + cmdUser);
                 var command = new MySqlCommand(cmdUser, conn);
 
@@ -219,9 +211,9 @@ namespace pc2udp
                 // Open connection to db
                 conn.Open();
 
-                var cmdUser = "UPDATE cartrackdb SET currenttrack = '" + FullTrackLocation + "', currentvehicle = '" + VehicleName + "' WHERE id=1"; //Only 1 row in this db, that changes when player changes car/track in-game
-                Console.WriteLine("cmdUser " + cmdUser);
-                var command = new MySqlCommand(cmdUser, conn);
+                var cmd = "UPDATE cartrackdb SET currenttrack = '" + FullTrackLocation + "', currentvehicle = '" + VehicleName + "' WHERE id=1"; //Only 1 row in this db, that changes when player changes car/track in-game
+                Console.WriteLine("cmd " + cmd);
+                var command = new MySqlCommand(cmd, conn);
 
                 command.ExecuteNonQuery();
                 Console.WriteLine("******NEW CAR - TRACK ADDED TO DATABASE*******");
@@ -240,7 +232,9 @@ namespace pc2udp
 
         static void Main(string[] args)
         {
-            //  UDP
+            //*********************
+            //  Start UDP reading *
+            //*********************
             UdpClient listener = new UdpClient(5606);                       //Create a UDPClient object
             IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, 5606);       //Start recieving data from any IP listening on port 5606 (port for PCARS2)
 
@@ -252,7 +246,9 @@ namespace pc2udp
             int gameState = uDP.GameState3 & 7;
             int sessionState = uDP.GameState3 >> 4;
 
-            // MAIN LOOP
+            //************
+            // MAIN LOOP *
+            //************
             while (true)
             {
             //Thread.Sleep(20);
@@ -260,10 +256,11 @@ namespace pc2udp
 
 
             /* Do some testing to detect session restarts. maybe a function to reset values */
-            /*if (strRaceMode == "Not Started") {
+            if (strRaceMode == "Not Started" & ValuesReset == 0) {
                 resetValues();
                 Console.WriteLine("Session restart/new session? Values reset.");
-            } */
+                ValuesReset = 1;
+            } 
 
             //****************************
             //Track Location (if not null)
@@ -272,14 +269,15 @@ namespace pc2udp
             {
                 TrackLocation = uDP.TrackLocation;
                 //Console.WriteLine("Track location is " + TrackLocation);
-                string TrackLocation2 = TrackLocation.Replace("_", " ");
+                TrackLocation = TrackLocation.Replace("_", " ");
 
                 //Track Variation
                 TrackVariation = uDP.TrackVariation;
                 //Console.WriteLine("Track variation is " + TrackVariation);
+                TrackVariation = TrackVariation.Replace("_", " ");
 
                 // Concatenate tracklocation2 and trackvariation 
-                FullTrackLocation = TrackLocation2 + " " + TrackVariation;
+                FullTrackLocation = TrackLocation + " " + TrackVariation;
                 //Console.WriteLine("FullTrackLocation is " + FullTrackLocation);
             }
 
@@ -298,19 +296,19 @@ namespace pc2udp
                     var list = new List<uint> { 3357278208, 151060480, 2156134400, 1158676480, 3747282944, 2585198592, 409534464, 3673882624, 1859780608, 2841116672, 349979920}; //These classes only have 1 character ahead of name
                     var exists = list.Contains(uDP.VehicleClass);
 
-                    if (exists == true)
+                    if (exists == true) // if uDP.Vehicle class index is found in list above...
                     {
-                        SubIndex = 1;
+                        SubIndex = 1; // ...then set SubIndex to = 1
                     }
                 }
                 if (uDP.VehicleIndex == 132) { VehicleName = "Ginetta G40 GT5"; } // For some reason, uDP.VehicleName is blank for this car
 
                 if (uDP.VehicleName != null && VehicleName != "Ginetta G40 GT5")
                 {
-                //Console.WriteLine("VehicleName is " + VehicleName);
-                VehicleName = ((uDP.VehicleName).Substring(SubIndex));
-                //Console.WriteLine("ClassINdex is " + uDP.VehicleClass);
-                //Console.WriteLine("VehicleNameSub is " + VehicleNameSub);
+                    //Console.WriteLine("VehicleName is " + VehicleName);     // VehicleName before SubString
+                    VehicleName = ((uDP.VehicleName).Substring(SubIndex));
+                    //Console.WriteLine("VehicleName is " + VehicleName);     // VehicleName after SubString
+                    //Console.WriteLine("ClassINdex is " + uDP.VehicleClass);     // ClassIndex
                 }
 
                 //Correct naming errors in vehicles and tracks
@@ -322,16 +320,15 @@ namespace pc2udp
                 if (VehicleName == "Mercedes-AMG A 45 SMS-R Touring") { VehicleName = "Mercedes-AMG A 45 SMS-R Touring";  }
                 if (FullTrackLocation == "SUGO GP") { FullTrackLocation = "Sportsland SUGO"; }
                 if (FullTrackLocation == "Laguna Seca ") { FullTrackLocation = "Mazda Raceway Laguna Seca"; }
-                if (FullTrackLocation == "Snetterton 100_Circuit") { FullTrackLocation = "Snetterton 100"; }
-                if (FullTrackLocation == "Snetterton 200_Circuit") { FullTrackLocation = "Snetterton 200"; }
-                if (FullTrackLocation == "Snetterton 300_Circuit") { FullTrackLocation = "Snetterton 300"; }
+                if (FullTrackLocation == "Snetterton 100 Circuit") { FullTrackLocation = "Snetterton 100"; }
+                if (FullTrackLocation == "Snetterton 200 Circuit") { FullTrackLocation = "Snetterton 200"; }
+                if (FullTrackLocation == "Snetterton 300 Circuit") { FullTrackLocation = "Snetterton 300"; }
 
                 //************************************************************
                 // Vehicle class name
                 //************************************************************
                 if (uDP.ClassName != null)
-                {
-                    
+                {                    
                     //Console.WriteLine("ClassIndex " + uDP.ClassIndex);
                     //Console.WriteLine("ClassName " + uDP.ClassName);
                 }
@@ -341,37 +338,34 @@ namespace pc2udp
                 //************************************************************************************************************
                 if ((VehicleName != null && FullTrackLocation != null) && (VehicleName != OldVehicleName || FullTrackLocation != OldFullTrackLocation))
                 {
-                   Console.WriteLine("Trying to send new car-track to db.");
-                   Console.WriteLine("Current track is " + FullTrackLocation);
-                   Console.WriteLine("Current vehicle is " + VehicleName);
+                    Console.WriteLine("Trying to send new car-track to db.");
+                    Console.WriteLine("Current track is " + FullTrackLocation);
+                    Console.WriteLine("Current vehicle is " + VehicleName);
                     dbCurrentCarTrack();
                 }
 
-                // Current Lap
+                // Current Lap 
                 double CurrentLap = (uDP.ParticipantInfo[uDP.ViewedParticipantIndex, 13]);
 
                 //Current sector 
                 double CurrentSector = (uDP.ParticipantInfo[uDP.ViewedParticipantIndex, 8]);
 
-                // Try to see if previous lap was invalid
-                if (strRaceMode == "Invalid")
-                { LastLapValid = "N"; }
-                else { LastLapValid = "Y"; }
+                //***************************************
+                // Try to see if current lap is invalid *
+                //***************************************
+                if (strRaceMode == "Invalid" && CurrentLapValid == "Y")
+                {
+                    CurrentLapValid = "N";
+                    Console.WriteLine("Lap invalidated, strRaceMode");
+                }
 
-                if (strSessionMode == "Invalid")
-                { LastLapValid = "N"; }
+                if (strSessionMode == "Invalid" && CurrentLapValid == "Y")
+                {
+                    CurrentLapValid = "N";
+                    Console.WriteLine("Lap invalidated, srtSessionMode");
+                }
 
-                // Last sector time
-                double LastSectorTime = (uDP.ParticipantStatsInfo[uDP.ViewedParticipantIndex, 4]);
-                if (LastSectorTime <= 0)
-                { LastLapValid = "N"; }
-
-                //Console.WriteLine("LastLapValid is " + LastLapValid);
-
-                // Car index
-                double CarIndex = (uDP.ParticipantInfo[uDP.ViewedParticipantIndex, 11]);
-                //Console.WriteLine("CarIndex is " + CarIndex);
-
+             
                 // RaceState
                 RaceState = (uDP.ParticipantInfo[uDP.ViewedParticipantIndex, 12]);
                 // Console.WriteLine("RaceState is " + RaceState);
@@ -380,18 +374,10 @@ namespace pc2udp
                 //Console.WriteLine("Game state is: " + gameState);
                 //Console.WriteLine("Session state is: " + sessionState);
 
-                //Event time left
-                float EventTimeRemaining = uDP.EventTimeRemaining;
-                //Console.WriteLine("Event time remaining is " + EventTimeRemaining);
-
-                // LapDistance
-                double LapDistance = (uDP.ParticipantInfo[uDP.ViewedParticipantIndex, 6]);
-                //Console.WriteLine("Lap distance is " + LapDistance);
-
                 //***************************************
                 // Get player name, update db if change *
                 //***************************************
-                //TODO load OldName from database first!
+                //TODO load OldName from database first?
                 Name = uDP.Name;
                 if (Name != OldName && Name != "" && Name != null)
                 {
@@ -399,12 +385,6 @@ namespace pc2udp
                     Console.WriteLine("New name is " + Name);
                     dbUsername();
                 }
-
-                //*****************************
-                // Flag colours
-                //*****************************
-                double HighestFlag = (uDP.ParticipantInfo[uDP.ViewedParticipantIndex, 9]);
-                //Console.WriteLine(HighestFlag);
 
                 //*********************
                 // Race state (Probably wrong way to get this, but some of them are working :))
@@ -419,7 +399,7 @@ namespace pc2udp
                     if (raceint == 9)
                     { strRaceMode = "Not Started"; }
                     if (raceint == 2)
-                    { strRaceMode = "Racing"; }
+                    { strRaceMode = "Racing"; ValuesReset = 0; }
                     if (raceint == 3)
                     { strRaceMode = "Finished"; }
                     if (raceint == 12)
@@ -471,23 +451,34 @@ namespace pc2udp
                 // Rain Density
                 RainDensity = uDP.RainDensity;
 
-                // See if sector has changed 
+                //******************************
+                // Check if sector has changed *
+                //******************************
                 if (PreviousSector != CurrentSector && strRaceMode == "Racing")
                 {
-
-                    // Fastest sector times
+                    // Fastest sector times (not used)
                     FastestSector1TimeSec = (uDP.ParticipantStatsInfo[uDP.ViewedParticipantIndex, 5]);
                     FastestSector2TimeSec = (uDP.ParticipantStatsInfo[uDP.ViewedParticipantIndex, 6]);
                     FastestSector3TimeSec = (uDP.ParticipantStatsInfo[uDP.ViewedParticipantIndex, 7]);
 
-                    // Set last sectortime to one of the sector times. 
-                    //Console.WriteLine("Sleep 300 ms");
-                    //Thread.Sleep(300);  // Test to let sector times etc get a chance to be received?
+                   // Write current and previous sector to console
                     Console.WriteLine("Current Sector is " + CurrentSector + " and Previous Sector was " + PreviousSector + "==========================");
-                    a++; // loop everything a few times so corret sector times gets to be sent. Then store sector times, and send laptime to db.
+                   
+                    //***************************************************************************
+                    // Loop everything a few times to allow for correct sector times to be sent *
+                    //***************************************************************************
+                    a++;
                     //Console.WriteLine("a = " + a);
-                    if (a > 3)
+                    if (a > 5)
                     {
+                        // Set last sectortime to the previous sector time 
+                        if (CurrentSector == 2)
+                        {
+                            LastSector1TimeSec = (uDP.ParticipantStatsInfo[uDP.ViewedParticipantIndex, 4]);
+                            //Console.WriteLine("Sector 1 time is " + LastSector1TimeSec);
+                            a = 0; // reset 'a'
+                            PreviousSector = CurrentSector; 
+                        }
 
                         if (CurrentSector == 3)
                         {    
@@ -502,26 +493,27 @@ namespace pc2udp
                             //Console.WriteLine("Sector 3 time is " + LastSector3TimeSec);
                             a = 0;
                             PreviousSector = CurrentSector;
-                        }
 
-                        if (CurrentSector == 2)
-                        {
-                            LastSector1TimeSec = (uDP.ParticipantStatsInfo[uDP.ViewedParticipantIndex, 4]);
-                            //Console.WriteLine("Sector 1 time is " + LastSector1TimeSec);
-                            a = 0;
-                            PreviousSector = CurrentSector;
+                            // Current sector=1 means previous sector=3 means New lap: check invalid lap variable
+                            if (CurrentLapValid == "N")
+                            {
+                                LastLapValid = "N"; // This value is stored in the db
+                                Console.WriteLine("Last lap was invalid");
+                            }
+                            else { LastLapValid = "Y"; Console.WriteLine("Last lap was valid"); }
+                            CurrentLapValid = "Y"; // Reset CurrentLapValid because of new lap
                         }
 
                         //****************************
                         // SENDING LAPTIME TO DATABASE
                         //****************************
                         // Check if we need to update db
-                        LastLapTimeSec = (uDP.ParticipantStatsInfo[uDP.ViewedParticipantIndex, 3]);
+                        LastLapTimeSec = (uDP.ParticipantStatsInfo[uDP.ViewedParticipantIndex, 3]); // lap time in seconds
                         OldFastestLapTimeSec = FastestLapTimeSec; // Store the previous fastest lap in session
                         FastestLapTimeSec = (uDP.ParticipantStatsInfo[uDP.ViewedParticipantIndex, 2]);    // Retrieve fastest lap in session                 
 
                         // Is it a new session lap record? 
-                        if (OldFastestLapTimeSec <= 0) { OldFastestLapTimeSec = 9999999999; }
+                        if (OldFastestLapTimeSec <= 0) { OldFastestLapTimeSec = 9999999999; } // if no record exists, set to 9999999999 to avoid null issues
                         if (LastLapTimeSec < OldFastestLapTimeSec)
                         {
                             SessionLapRecord = "Y";
@@ -530,28 +522,27 @@ namespace pc2udp
                         else
                         { SessionLapRecord = "N"; }
 
-                        // CHeck if lap is valid
-                        if (strRaceMode == "Invalid")
-                        { CurrentValidLap = "N"; }
-                        else { CurrentValidLap = "Y"; }
-
                         // Check if it's a new lap that should be sent to db
-                        if (LastLapTimeSec > 0 && OldLapTimeSec != LastLapTimeSec && CurrSessionState != 4 && strSessionMode == "Time Trial")  //TT only. excluding formation laps (untested). Should check for in/out laps too.
+                        if (LastLapTimeSec > 0 && OldLapTimeSec != LastLapTimeSec && CurrSessionState != 4)  //TT only. excluding formation laps (untested). Should check for in/out laps too.
                         {
-                            dbfetchrecord(); //get lap records from db
-                            if (dbLapRecord <= 0) { dbLapRecord = 99999999999; }
+                            dbFetchRecord(); //get lap records from db
+                            if (dbLapRecord <= 0) { dbLapRecord = 99999999999; }   // if no record exists in db, set to 9999999999 to avoid null issues
                             // Is it an All Time Record?
                             if (LastLapTimeSec < dbLapRecord)
                             {
-                                AllTimeRecord = "Y"; Console.WriteLine("* * * * * * * * * * N E W  L A P  R E C O R D * * * * * * * * *");
+                                if (LastLapValid == "Y")
+                                {
+                                    AllTimeRecord = "Y"; Console.WriteLine("* * * * * * * * * * N E W  L A P  R E C O R D * * * * * * * * *");
+                                }
+                                else { Console.WriteLine("New lap record, but unfortunately invalid lap"); }
                             }
                             else { AllTimeRecord = "N"; }
-                            dbupdate(); // Send the lap to MariaDB
-
+                            dbSendLapToDb(); // Send the lap to MariaDB
+                            CurrentLapValid = "Y"; // Reset CurrentLapValid
                             OldLapTimeSec = LastLapTimeSec; // Store the last lap time in variable for later comparisons
                         }
 
-                    } // end of 'a'-loop
+                    } // end of 'a++'-loop
 
                 } // end of 'if sector has changed'
             }
