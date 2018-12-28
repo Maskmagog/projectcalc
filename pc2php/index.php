@@ -277,10 +277,11 @@ if ($playerrow != "" AND $lbselect=='AllTopTimes') {
 	if (CEIL($total_rows/$limit) > 1 AND CEIL($playerrow/$limit) > 1 AND $playerrow > 3) {  // If total number of pages > 1 and players page > 1, then display pagelink
 		echo "Goto page: <a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&lbselect={$lbselect}&page=$playerpage\">$playerpage</a>"; // Create link to page player is on
 	} 
-	elseif ($playerrow == 3){ echo "Bronze!";}
-	elseif ($playerrow == 2){ echo "Silver!";}
-	elseif ($playerrow == 1){ echo "WORLD RECORD!";}
-	else { echo "Front page!";}
+	elseif ($playerrow == 3){ echo "<strong>Bronze!</strong>";}
+	elseif ($playerrow == 2){ echo "<strong>Silver!/<strong>";}
+	elseif ($playerrow == 1){ echo "<span class='blink'><strong>WORLD RECORD!</strong></span>";}
+	elseif ($playerrow < 11){ echo "<strong>Top ten!</strong>";}
+	else { echo "<strong>Front page!</strong>";}
 	echo "</div>";
 }	
 if ($playerrow == "" || $playerrow == null) {
@@ -327,7 +328,8 @@ ORDER BY laptime ASC LIMIT ? OFFSET ?");
 //*************************
 // Go to Racing Mode Page *
 //*************************
-echo "<span class='racingmodebutton'><a href='race.php'>Go Race Mode</a></span>";
+// echo "<span class='racingmodebutton'><a href='race.php'>Go Race Mode</a></span>";
+echo "<span class='racingmodebutton'><a href='race.php'><button>Race Mode</button></a></span>";
 
 // End of header
 echo "</header>";

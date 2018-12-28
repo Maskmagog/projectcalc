@@ -156,6 +156,17 @@ a:active{
 	padding-top:10px;
 	font-size:14px;
 }
+.blink {
+    animation-duration: 2s;
+    animation-name: blink;
+    animation-iteration-count: infinite;
+    animation-timing-function: steps(2, start);
+}
+@keyframes blink {
+    90% {
+        visibility: hidden;
+    }
+}
 .tooltip{
 	position: relative;
 	display: inline-block;

@@ -274,6 +274,7 @@ if ($playerrow == 1)
 	$_SESSION['rival'][0] = "W O R L D";
 	$_SESSION['rival'][1] = "R E C O R D";
 	$_SESSION['rival'][2] = "! ! ! ! ! !";
+	$blink = "blink";
 }
 
 //*************************************
@@ -290,7 +291,7 @@ echo "<table id='racingtable' class='racingtable'>
 for ($i = 0; $i < $_SESSION['rivalnr']; $i++){	
 echo"<tr>
 <td align='right'>" . $rivalrow[$i] . ".</td>
-<td>" . $_SESSION['rival'][$i] . "</td>
+<td class=$blink>" . $_SESSION['rival'][$i] . "</td>
 <td>" . convertTo($rivalrecord[$i]) . "</td>
 <td align='right'>" . convertToGap($rivaldiff[$i]) . "</td>
 </tr>";
@@ -303,6 +304,7 @@ echo "<tr class=" . $playerrecordclass . ">
 </tr>
 </table>"; // End of table
 echo "</div>";
+$blink=""; // reset $blink
 
 //*******
 // LOGO *
@@ -313,7 +315,7 @@ echo "<div class='racelogo'><img src='img/pcalc_logo.png' alt='<Project CALC log
 echo "<span style='color:#ffffff'>Current track is " . $_SESSION['trackselect'] . ". Current car is " . $_SESSION['carselect'] . "</span>";
 
 // Return to leaderboard link
-echo "<br><br><span class='returnlink'><a href='index.php?trackselect={$_SESSION['trackselect']}&carselect={$_SESSION['carselect']}&lbselect=AllTopTimes'>Back to leaderboard</a></span><br><br>";
+echo "<br><br><span class='returnlink'><a href='index.php?trackselect={$_SESSION['trackselect']}&carselect={$_SESSION['carselect']}&lbselect=AllTopTimes'><button>Back to leaderboard</button></a></span><br><br>";
 
 // Buttons to turn on/off autoupdate
 echo "<span class='autoupdatebuttons'><form method='POST' action='race.php'>	
