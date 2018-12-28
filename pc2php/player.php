@@ -75,7 +75,7 @@ while ($row = $result->fetch_assoc()) {  /* fetch the results into an array */
 	echo "<td><a href='index.php?trackselect=" . $row['track'] . "&carselect=%%&lbselect=AllTopTimes'>" . $row['track'] . "</a></td>";
 	echo "<td>" . $row['gamertag'] . "</td>";
 	echo "<td><a href='index.php?trackselect=" . $row['track'] . "&carselect=" . $row['vehicle'] . "&lbselect=AllTopTimes'>" . $row['vehicle'] . "</a></td>";
-	echo "<td><div class='tooltip'>" . convertTo($row['laptime']) . "<span class='tooltiptext'>S1:" . convertTo($row['S1']) . " S2:" . convertTo($row['S2']) . " S3:" . convertTo($row['S3']) . "</td>"; /*convertTo-function formats time 00:00.000 */
+	echo "<td><div class='tooltip'>" . convertTo($row['laptime']) . "<span class='tooltiptext'>S1:" . convertTo($row['sector1']) . " S2:" . convertTo($row['sector2']) . " S3:" . convertTo($row['sector3']) . "</td>"; /*convertTo-function formats time 00:00.000 */
 	echo "<td>" . substr($row['lapdate'],0,16) . "</td>";
 	echo "<td>" . $row['sessionmode'] . "</td>";
 	echo "</tr>";
