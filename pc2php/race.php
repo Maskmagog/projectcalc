@@ -259,6 +259,23 @@ $playerdisplay = substr($playerdisplay,0,20);
 for ($i = 0; $i < $_SESSION['rivalnr']; $i++){	
 	$_SESSION['rival'][$i] = substr($_SESSION['rival'][$i],0, 20);
 }
+
+// Check if player position is less than number of available rivals.
+if (($playerrow) <= ($_SESSION['rivalnr'] + 1) AND $playerrow != 1) // If there's more rivals selected than left on the leaderboard (and player is not WR)
+{ 
+	$_SESSION['rivalnr'] = ($playerrow - 2); // If player is at nr 5, then only display WR plus 3 more rival, so (5-2).
+	echo "<meta http-equiv='refresh' content='0'>"; // refresh to update page with new nr of rivals
+}
+
+// Check if player has WR
+if ($playerrow == 1)
+{
+	$_SESSION['rivalnr'] = 3;
+	$_SESSION['rival'][0] = "W O R L D";
+	$_SESSION['rival'][1] = "R E C O R D";
+	$_SESSION['rival'][2] = "! ! ! ! ! !";
+}
+
 //*************************************
 //* Start Racing Mode Table
 //*************************************
