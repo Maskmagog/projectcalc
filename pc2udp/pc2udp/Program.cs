@@ -36,7 +36,7 @@ namespace pc2udp
         private static double FastestSector3TimeSec = 0;
         private static Int16 TrackTemp;
         private static Int16 AmbTemp;
-        private static double PreviousSector = 1;
+        private static double PreviousSector = 3;
         private static string SessionLapRecord = "N";
         private static double OldFastestLapTimeSec = 99999999;
         private static double FastestLapTimeSec = 0;
@@ -69,7 +69,7 @@ namespace pc2udp
             FastestSector1TimeSec = 0;
             FastestSector2TimeSec = 0;
             FastestSector3TimeSec = 0;
-            PreviousSector = 1;
+            PreviousSector = 3;
             OldFastestLapTimeSec = 99999999;
             dbLapRecord = 0;
             SessionLapRecord = "N";
@@ -454,16 +454,16 @@ namespace pc2udp
                 //******************************
                 // Check if sector has changed *
                 //******************************
-                if (PreviousSector != CurrentSector && strRaceMode == "Racing")
+                if (PreviousSector != CurrentSector && strRaceMode != "Not Started")
                 {
                     // Fastest sector times (not used)
                     FastestSector1TimeSec = (uDP.ParticipantStatsInfo[uDP.ViewedParticipantIndex, 5]);
                     FastestSector2TimeSec = (uDP.ParticipantStatsInfo[uDP.ViewedParticipantIndex, 6]);
                     FastestSector3TimeSec = (uDP.ParticipantStatsInfo[uDP.ViewedParticipantIndex, 7]);
 
-                   // Write current and previous sector to console
-                    Console.WriteLine("Current Sector is " + CurrentSector + " and Previous Sector was " + PreviousSector + "==========================");
-                   
+                    // Write current and previous sector to console
+                   // Console.WriteLine("Current Sector is " + CurrentSector + " and Previous Sector was " + PreviousSector + "==========================");
+
                     //***************************************************************************
                     // Loop everything a few times to allow for correct sector times to be sent *
                     //***************************************************************************
@@ -475,7 +475,7 @@ namespace pc2udp
                         if (CurrentSector == 2)
                         {
                             LastSector1TimeSec = (uDP.ParticipantStatsInfo[uDP.ViewedParticipantIndex, 4]);
-                            //Console.WriteLine("Sector 1 time is " + LastSector1TimeSec);
+                            Console.WriteLine("Sector 1 time is " + LastSector1TimeSec);
                             a = 0; // reset 'a'
                             PreviousSector = CurrentSector; 
                         }
@@ -483,14 +483,14 @@ namespace pc2udp
                         if (CurrentSector == 3)
                         {    
                             LastSector2TimeSec = (uDP.ParticipantStatsInfo[uDP.ViewedParticipantIndex, 4]); // 
-                            //Console.WriteLine("Sector 2 time is " + LastSector2TimeSec);
+                            Console.WriteLine("Sector 2 time is " + LastSector2TimeSec);
                             a = 0;
                             PreviousSector = CurrentSector;
                         }
                         if (CurrentSector == 1)
                         {
                             LastSector3TimeSec = (uDP.ParticipantStatsInfo[uDP.ViewedParticipantIndex, 4]);
-                            //Console.WriteLine("Sector 3 time is " + LastSector3TimeSec);
+                            Console.WriteLine("Sector 3 time is " + LastSector3TimeSec);
                             a = 0;
                             PreviousSector = CurrentSector;
 
