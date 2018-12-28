@@ -280,26 +280,36 @@ if ($playerrow == 1)
 //*************************************
 //* Start Racing Mode Table
 //*************************************
-echo "<div class='racepage' id='racepageid'>";
-echo "<table id='racingtable' class='racingtable'>
+echo "<div class='racepage' id='racepageid'>
+<table id='racingtable' class='racingtable'>
 <tr>
 <td width='8%' align='right'>1. </td>
-<td><div class='racepagename'>" . $worldrecordholder . "</div></td>
-<td width='20%'>" . convertTo($worldrecord) . "</td>
-<td width='20%'align='right'>" . convertToGap($wrdiff) . "</td>
-</tr>";
-for ($i = 0; $i < $_SESSION['rivalnr']; $i++){	
-echo"<tr>
-<td align='right'>" . $rivalrow[$i] . ".</td>
-<td class=$blink>" . $_SESSION['rival'][$i] . "</td>
-<td>" . convertTo($rivalrecord[$i]) . "</td>
-<td align='right'>" . convertToGap($rivaldiff[$i]) . "</td>
-</tr>";
+<td width='52%'><div class='racepagename'>" . $worldrecordholder . "</div></td> 
+<td align='right' width='20%'>" . convertTo($worldrecord) . "</td>"; // World record time
+if ($playerrecord == 0) {
+	echo "<td align='right' width='20%'>--.---</td>"; // display --.--- as gap if player has no time set
 }
+else {
+	echo "<td align='right' width='20%'>" . convertToGap($wrdiff) . "</td>";   // else display correct gap
+	} 
+echo "</tr>";
+for ($i = 0; $i < $_SESSION['rivalnr']; $i++){	// Loop through current number of rivals set
+echo"<tr>
+<td align='right'>" . $rivalrow[$i] . ".</td> 
+<td class=$blink>" . $_SESSION['rival'][$i] . "</td> 
+<td align='right'>" . convertTo($rivalrecord[$i]) . "</td>"; // Rival time
+if ($playerrecord == 0) {
+	echo "<td align='right'>--.---</td>"; // display --.--- as gap if player has no time set
+}
+else {
+	echo "<td align='right'>" . convertToGap($rivaldiff[$i]) . "</td>";  // Rival gap
+} // end of if else about gap
+echo "</tr>";
+} // end of rivals loop
 echo "<tr class=" . $playerrecordclass . "> 
 <td align='right'>" . $playerrow . ". </td> 
-<td>" . $playerdisplay . "</td>
-<td>" . convertTo($playerrecord) . "</td>
+<td>" . $playerdisplay . "</td> 
+<td align='right'>" . convertTo($playerrecord) . "</td> 
 <td align='right'></td>
 </tr>
 </table>"; // End of table
