@@ -170,12 +170,14 @@ echo "<div class='button1'><button name='lbselect' type='submit' value='AllTopTi
 <button name='lbselect' type='submit' value='AllPersonalTimes'>All personal laps</button></form></div>";
 
 //************************
-// Search for playername * - NOT WORKING?
+// Search for playername * 
 //************************
 echo "<div class='search'><form action='/player.php' method='get'><input type='text' name='player' size='10' placeholder='search for player'><input type='submit' value='Search'>
 </form></div>";
-	
-// Get username: Prepare sql statement, bind parameters, fetch data 
+
+//*****************************************************************	
+// Get gamertag: Prepare sql statement, bind parameters, fetch data
+//***************************************************************** 
 $id = 1; // Only 1 record in this table, namely the username
 $stmt = $mysqli->prepare("SELECT username FROM user WHERE id = ?"); // Player gamertag is stored in table user with id=1. Set from pc2udp script, which reads the gamertag from UDP
 $stmt->bind_param("i", $id); //i is for integer
@@ -272,9 +274,12 @@ if ($playerrow != "" AND $lbselect=='AllTopTimes') {
 	$pospercent = CEIL(($playerrow/$total_rows)*100);  // Calculate what top % player is in
 	echo "<div class='position'>Your" . $bestifalltoptimes . " time: " . convertTo($playerrecord) . ". Your" . $bestifalltoptimes . " position: <strong>{$playerrow}</strong> out of <strong>{$total_rows}</strong>. Top {$pospercent}% ";
 	// Only show link to player page if it's not on first page
-	if (CEIL($total_rows/$limit) > 1 AND CEIL($playerrow/$limit) > 1) {  // If total number of pages > 1 and players page > 1, then display pagelink
+	if (CEIL($total_rows/$limit) > 1 AND CEIL($playerrow/$limit) > 1 AND $playerrow > 3) {  // If total number of pages > 1 and players page > 1, then display pagelink
 		echo "Goto page: <a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&lbselect={$lbselect}&page=$playerpage\">$playerpage</a>"; // Create link to page player is on
 	} 
+	elseif ($playerrow == 3){ echo "Bronze!";}
+	elseif ($playerrow == 2){ echo "Silver!";}
+	elseif ($playerrow == 1){ echo "WORLD RECORD!";}
 	else { echo "Front page!";}
 	echo "</div>";
 }	
