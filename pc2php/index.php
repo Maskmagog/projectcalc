@@ -166,8 +166,8 @@ if (!empty($_GET['carselect'])) {
 
 // Buttons for selecting AllTopTimes, TopPersonalTimes or AllPersonalTimes (in different div tags)						
 echo "<div class='button1'><button name='lbselect' type='submit' value='AllTopTimes'>Show leaderboard</button></div>
-<div class='button2'><button name='lbselect' type='submit' value='TopPersonalTimes'>Top personal laps</button>
-<button name='lbselect' type='submit' value='AllPersonalTimes'>All personal laps</button></form></div>";
+<div class='button2'><button name='lbselect' type='submit' value='TopPersonalTimes'>Top personal times</button>
+<button name='lbselect' type='submit' value='AllPersonalTimes'>All personal times</button></form></div>";
 
 //************************
 // Search for playername * 
@@ -272,7 +272,7 @@ if ($carselect == "%%") {$bestifalltoptimes = " best";}
 // Only show player position if it exists
 if ($playerrow != "" AND $lbselect=='AllTopTimes') {
 	$pospercent = CEIL(($playerrow/$total_rows)*100);  // Calculate what top % player is in
-	echo "<div class='position'>Your" . $bestifalltoptimes . " time: " . convertTo($playerrecord) . ". Your" . $bestifalltoptimes . " position: <strong>{$playerrow}</strong> out of <strong>{$total_rows}</strong>. Top {$pospercent}% ";
+	echo "<div class='position'>Your" . $bestifalltoptimes . " time: <strong>" . convertTo($playerrecord) . "</strong>. Your" . $bestifalltoptimes . " position: <strong>{$playerrow}</strong> out of <strong>{$total_rows}</strong>. Top {$pospercent}% ";
 	// Only show link to player page if it's not on first page
 	if (CEIL($total_rows/$limit) > 1 AND CEIL($playerrow/$limit) > 1 AND $playerrow > 3) {  // If total number of pages > 1 and players page > 1, then display pagelink
 		echo "Goto page: <a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&lbselect={$lbselect}&page=$playerpage\">$playerpage</a>"; // Create link to page player is on
@@ -280,6 +280,7 @@ if ($playerrow != "" AND $lbselect=='AllTopTimes') {
 	elseif ($playerrow == 3){ echo "<strong>Bronze!</strong>";}
 	elseif ($playerrow == 2){ echo "<strong>Silver!/<strong>";}
 	elseif ($playerrow == 1){ echo "<span class='blink'><strong>WORLD RECORD!</strong></span>";}
+	elseif ($playerrow < 6){ echo "<strong>Top five!</strong>";}
 	elseif ($playerrow < 11){ echo "<strong>Top ten!</strong>";}
 	else { echo "<strong>Front page!</strong>";}
 	echo "</div>";
