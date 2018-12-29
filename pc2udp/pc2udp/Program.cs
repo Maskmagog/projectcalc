@@ -6,6 +6,7 @@ using System.Threading;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using System.Runtime.InteropServices;
+using System.Data.SqlClient;
 
 namespace pc2udp
 {
@@ -43,6 +44,7 @@ namespace pc2udp
         private static double dbLapRecord = 0;
         private static string AllTimeRecord = "N";
         public static string VehicleName;
+        public static string VehicleClass;
         public static string strSessionMode;
         public static char CurrGameState;
         public static char CurrSessionState;
@@ -98,7 +100,7 @@ namespace pc2udp
                 command.Parameters.Add("?gamertag", MySqlDbType.VarChar, 64).Value = Name;
                 command.Parameters.Add("?track", MySqlDbType.VarChar, 64).Value = FullTrackLocation;
                 command.Parameters.Add("?vehicle", MySqlDbType.VarChar, 64).Value = VehicleName;
-                command.Parameters.Add("?vehicleclass", MySqlDbType.VarChar, 64).Value = "Class"; // Not functioning right now
+                command.Parameters.Add("?vehicleclass", MySqlDbType.VarChar, 64).Value = VehicleClass; 
                 command.Parameters.Add("?laptime", MySqlDbType.Double).Value = LastLapTimeSec;
                 command.Parameters.Add("?sector1", MySqlDbType.Double).Value = LastSector1TimeSec;
                 command.Parameters.Add("?sector2", MySqlDbType.Double).Value = LastSector2TimeSec;
@@ -310,11 +312,74 @@ namespace pc2udp
                     //Console.WriteLine("VehicleName is " + VehicleName);     // VehicleName after SubString
                     //Console.WriteLine("ClassINdex is " + uDP.VehicleClass);     // ClassIndex
                 }
+                // Vehicle class
+                if (uDP.VehicleClass == 151060480) { VehicleClass = "GTO"; }
+                if (uDP.VehicleClass == 1039138816) { VehicleClass = "GT1"; }
+                if (uDP.VehicleClass == 2041511936) { VehicleClass = "GT3"; }
+                if (uDP.VehicleClass == 3878354944) { VehicleClass = "GT4"; }
+                if (uDP.VehicleClass == 3007315968) { VehicleClass = "GT5";}
+                if (uDP.VehicleClass == 496107520) { VehicleClass = "G40 Junior"; }
+                if (uDP.VehicleClass == 4259840) { VehicleClass = "GTE"; }
+                if (uDP.VehicleClass == 4252434432) { VehicleClass = "Group A"; }
+                if (uDP.VehicleClass == 572784640) { VehicleClass = "Group B"; }
+                if (uDP.VehicleClass == 2176057344) { VehicleClass = "Group C"; }
+                if (uDP.VehicleClass == 2980708352) { VehicleClass = "Group 4"; }
+                if (uDP.VehicleClass == 2203385856) { VehicleClass = "Group 5"; }
+                if (uDP.VehicleClass == 794427392) { VehicleClass = "Group 6"; }
+                if (uDP.VehicleClass == 1158676480) { VehicleClass = "CanAm"; }
+                if (uDP.VehicleClass == 3614507008) { VehicleClass = "RXLites"; }
+                if (uDP.VehicleClass == 2841116672) { VehicleClass = "TC1"; }
+                if (uDP.VehicleClass == 409534464) { VehicleClass = "Touring Car"; }
+                if (uDP.VehicleClass == 2381971456) { VehicleClass = "Vintage Prototype A"; }
+                if (uDP.VehicleClass == 1155465216) { VehicleClass = "Vintage Prototype B"; }
+                if (uDP.VehicleClass == 1636630528) { VehicleClass = "Vintage RX"; }
+                if (uDP.VehicleClass == 1476722688) { VehicleClass = "Vintage Touring-GT A"; }
+                if (uDP.VehicleClass == 2908356608) { VehicleClass = "Vintage Touring-GT B"; }
+                if (uDP.VehicleClass == 1973682176) { VehicleClass = "Vintage Touring-GT C)"; }
+                if (uDP.VehicleClass == 1233584128) { VehicleClass = "Vintage-Touring-GT D"; }
+                if (uDP.VehicleClass == 1859780608) { VehicleClass = "Track Day B"; }
+                if (uDP.VehicleClass == 3239051264) { VehicleClass = "Track Day A"; }
+                if (uDP.VehicleClass == 3673882624) { VehicleClass = "Ferrari Series"; }
+                if (uDP.VehicleClass == 559480832) { VehicleClass = "Ferrari F355 Series"; }
+                if (uDP.VehicleClass == 3747282944) { VehicleClass = "Indycar"; }
+                if (uDP.VehicleClass == 3361865728) { VehicleClass = "F5"; }
+                if (uDP.VehicleClass == 788135936) { VehicleClass = "Formula C)"; }
+                if (uDP.VehicleClass == 2156134400) { VehicleClass = "Formula Renault"; }
+                if (uDP.VehicleClass == 4294443008) { VehicleClass = "Formula A"; }
+                if (uDP.VehicleClass == 836239360) { VehicleClass = "Formula X"; }
+                if (uDP.VehicleClass == 308084736) { VehicleClass = "V8 Supercars"; }
+                if (uDP.VehicleClass == 2669346816) { VehicleClass = "Vintage F1A"; }
+                if (uDP.VehicleClass == 2635988992) { VehicleClass = "Vintage F1B"; }
+                if (uDP.VehicleClass == 1596850176) { VehicleClass = "Vintage F1C"; }
+                if (uDP.VehicleClass == 1984233472) { VehicleClass = "Vintage F1D"; }
+                if (uDP.VehicleClass == 309395456) { VehicleClass = "Vintage F3 A"; }
+                if (uDP.VehicleClass == 2864316416) { VehicleClass = "Vintage Indycar"; }
+                if (uDP.VehicleClass == 1233584128) { VehicleClass = "Vintage-Touring-GT D"; }
+                if (uDP.VehicleClass == 3645046784) { VehicleClass = "Drift"; }
+                if (uDP.VehicleClass == 2183659520) { VehicleClass = "Kart"; }
+                if (uDP.VehicleClass == 1424818176) { VehicleClass = "LMP1 2016 (LMPH)"; }
+                if (uDP.VehicleClass == 3294560256) { VehicleClass = "LMP 900"; }
+                if (uDP.VehicleClass == 2251096064) { VehicleClass = "LMP1"; }
+                if (uDP.VehicleClass == 3502637056) { VehicleClass = "LMP2"; }
+                if (uDP.VehicleClass == 437256192) { VehicleClass = "LMP3"; }
+                if (uDP.VehicleClass == 1250557952) { VehicleClass = "Mégane Trophy"; }
+                if (uDP.VehicleClass == 843186176) { VehicleClass = "Modern Stockcar"; }
+                if (uDP.VehicleClass == 3707043840) { VehicleClass = "Road A"; }
+                if (uDP.VehicleClass == 2258239488) { VehicleClass = "Road B"; }
+                if (uDP.VehicleClass == 2110521344) { VehicleClass = "Road C"; }
+                if (uDP.VehicleClass == 2740781056) { VehicleClass = "Road D"; }
+                if (uDP.VehicleClass == 3872456704) { VehicleClass = "Road E"; }
+                if (uDP.VehicleClass == 3357278208) { VehicleClass = "Road F"; }
+                if (uDP.VehicleClass == 2585198592) { VehicleClass = "Road G"; }
+                if (uDP.VehicleClass == 3735355392) { VehicleClass = "RS01 Trophy"; }
+                if (uDP.VehicleClass == 692912128) { VehicleClass = "Super Trofeo"; }
+                if (uDP.VehicleClass == 2367946752) { VehicleClass = "Trophy Truck"; }
+                if (uDP.VehicleClass == 335872000) { VehicleClass = "WRX"; }
 
                 //Correct naming errors in vehicles and tracks
                 if (VehicleName == "RenaultMeganeRSSMSRTouring") { VehicleName = "Renault Mégane R.S. SMS-R Touring";}
                 if (VehicleName == "RenaultMeganeTrophyV6") { VehicleName = "Renault Mégane Trophy V6"; }
-                if (VehicleName == "LamborghiniHuracanLP6202SuperTrofeo") { VehicleName = "Lamborghini Huracán Super Trofeo"; }
+                if (VehicleName == "LamborghiniHuracanLP6202SuperTrofeo") { VehicleName = "Lamborghini Huracan LP620-2 Super Trofeo"; }
                 if (VehicleName == "BMW1SeriesMCoupeStanceWorksEdition") { VehicleName = "BMW 1 Series M Coupe StanceWorks Edition"; }
                 if (VehicleName == "Honda24Concept") { VehicleName = "Honda 2&4 Concept"; }
                 if (VehicleName == "Mercedes-AMG A 45 SMS-R Touring") { VehicleName = "Mercedes-AMG A 45 SMS-R Touring";  }
@@ -341,6 +406,8 @@ namespace pc2udp
                     Console.WriteLine("Trying to send new car-track to db.");
                     Console.WriteLine("Current track is " + FullTrackLocation);
                     Console.WriteLine("Current vehicle is " + VehicleName);
+                    Console.WriteLine("Current class is " + VehicleClass);
+                    Console.WriteLine("VehicleClass is " + uDP.VehicleClass);
                     dbCurrentCarTrack();
                 }
 
