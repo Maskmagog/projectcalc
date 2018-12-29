@@ -41,8 +41,8 @@
 .search{display: inline-block; padding-left: 10px; padding-top: 10px; padding-right:10px; padding-bottom: 10px;}
 .racingmodebutton{float:right; clear: right; padding-top: 10px;}
 .addrival{display: inline; padding-left: 10px; padding-top: 3px;}
-.racelogo{float: right; clear: right; padding-right: 10px; padding-bottom: 10px;}
-.autoupdatebuttons{float: right; clear: right; padding-right: 10px; padding-bottom: 0px;}
+.racelogo{float: right; clear: right; padding-bottom: 10px;}
+.autoupdatebuttons{float: right; clear: right; padding-bottom: 0px;}
 .position{
 	display: inline-block;
 	width: auto;
@@ -81,25 +81,25 @@
 	border:1px solid #333;
 	background:#888888;
 }
-.racepage{
+ .racepage{
 	display: block;
 	color: #ffffff;
 	padding-left: 10px;
 	padding-top: 10px;
-	padding-right:10px;
+	padding-right: 10px;
 	padding-bottom: 10px;
-	font-size: 2em;
-	background:#888888;
+	background:#888888; 
 }
 .racepage table{
-	display: block;
+	display: table;
+	width: 100%;
 	table-layout: fixed;
-	width: 98%;
 	color: #fffb28;
 	padding-left: 10px;
 	padding-top: 10px;
 	padding-right:10px;
 	padding-bottom: 10px;
+	margin-bottom: 10px;
 	font-family: 'LCD-Bold' !important;
 	font-size: 40px;
 	background-color: #333333;
@@ -140,7 +140,11 @@ a:hover{
 a:active{
 	color: #222222;
 }
-.returnlink a{
+.racetext a{
+	color: #ffffff;
+	text-decoration: none;
+}
+#racetext {
 	color: #ffffff;
 	text-decoration: none;
 }

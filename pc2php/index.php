@@ -462,13 +462,13 @@ while ($row = $result->fetch_assoc())
 	
 // Check if it's the playerrow, or podium row	
 if ($row['gamertag'] == $username && $lbselect == 'AllTopTimes') {$class='player';} // Set row with player name to class="player' if it's on normal leaderboard	
-if ($rank == 1) {$class='gold';}
+if ($rank == 1) {$class='gold'; } // $trophy="<img width='20' height='10' src=gold.png>";
 if ($rank == 2) {$class='silver';}
 if ($rank == 3) {$class='bronze';}
-
+if ($rank > 3 ) {$trophy="";}
 
 echo "<tr class='$class'>";
-echo "<td>" . $rank . ".</td>";
+echo "<td>" . $rank . ". $trophy</td>";
 echo "<td><a href='player.php?player=" . $row['gamertag'] . "'>" . $row['gamertag'] . "</a></td>"; // link to players complete laps
 echo "<td><a href='index.php?trackselect={$trackselect}&carselect={$row['vehicle']}&lbselect=AllTopTimes'>" . $row['vehicle'] . "</a></td>"; // link to leaderboard for that car
 echo "<td><span class='tooltip'>" . convertTo($row['laptime']) . "<span class='tooltiptext'>S1:" . convertTo($row['sector1']) . " S2:" . convertTo($row['sector2']) . " S3:" . convertTo($row['sector3']) . "</span></span></td>"; /*convertTo-function formats time 00:00.000 */

@@ -236,9 +236,9 @@ for ($i = 0; $i < $_SESSION['rivalnr']; $i++){
 	else {$rivaldiff[$i] = $rivalrecord[$i]-$playerrecord;}
 }
 
-// Replace accented characters not supported by font
-$search  = array('Á','À','É','È','Ú','Ó','Ò','Å','Ä','Ö','Ê','Ñ','ö','å','ä','é','è','á','à','ú','ó'); // Characters to look for
-$replace = array('A','A','E','E','U','O','O','A','A','O','E','N','O','A','A','E','E','A','A','U','O'); //Replace with these
+// Replace accented characters not supported by fontŚWIę
+$search  = array('Á','À','É','È','Ú','Ó','Ò','Å','Ä','Ö','Ê','Ñ','ö','å','ä','é','è','á','à','ú','ó','Ś','ę'); // Characters to look for
+$replace = array('A','A','E','E','U','O','O','A','A','O','E','N','O','A','A','E','E','A','A','U','O','S','E'); //Replace with these
 
 //Replace in rival names
 for ($i = 0; $i < $_SESSION['rivalnr']; $i++){	
@@ -281,16 +281,16 @@ if ($playerrow == 1)
 //* Start Racing Mode Table
 //*************************************
 echo "<div class='racepage' id='racepageid'>
-<table id='racingtable' class='racingtable'>
-<tr>
+<table>
+<tbody><tr>
 <td width='8%' align='right'>1. </td>
-<td width='52%'><div class='racepagename'>" . $worldrecordholder . "</div></td> 
+<td><div class='racepagename'>" . $worldrecordholder . "</div></td> 
 <td align='right' width='20%'>" . convertTo($worldrecord) . "</td>"; // World record time
 if ($playerrecord == 0) {
 	echo "<td align='right' width='20%'>--.---</td>"; // display --.--- as gap if player has no time set
 }
 else {
-	echo "<td align='right' width='20%'>" . convertToGap($wrdiff) . "</td>";   // else display correct gap
+	echo "<td align='right' width='20%'>+" . convertToGap($wrdiff) . "</td>";   // else display correct gap
 	} 
 echo "</tr>";
 for ($i = 0; $i < $_SESSION['rivalnr']; $i++){	// Loop through current number of rivals set
@@ -302,7 +302,7 @@ if ($playerrecord == 0) {
 	echo "<td align='right'>--.---</td>"; // display --.--- as gap if player has no time set
 }
 else {
-	echo "<td align='right'>" . convertToGap($rivaldiff[$i]) . "</td>";  // Rival gap
+	echo "<td align='right'>+" . convertToGap($rivaldiff[$i]) . "</td>";  // Rival gap
 } // end of if else about gap
 echo "</tr>";
 } // end of rivals loop
@@ -312,8 +312,8 @@ echo "<tr class=" . $playerrecordclass . ">
 <td align='right'>" . convertTo($playerrecord) . "</td> 
 <td align='right'></td>
 </tr>
-</table>"; // End of table
-echo "</div>";
+</tbody></table>"; // End of table
+// echo "</div>";
 $blink=""; // reset $blink
 
 //*******
@@ -322,10 +322,18 @@ $blink=""; // reset $blink
 echo "<div class='racelogo'><img src='img/pcalc_logo.png' alt='<Project CALC logo'></div>";
 
 // Print current combo
-echo "<span style='color:#ffffff'>Current track is " . $_SESSION['trackselect'] . ". Current car is " . $_SESSION['carselect'] . "</span>";
+echo "<span id='racetext'>Current track is " . $_SESSION['trackselect'] . ". Current car is " . $_SESSION['carselect'] . "</span>";
 
 // Return to leaderboard link
-echo "<br><br><span class='returnlink'><a href='index.php?trackselect={$_SESSION['trackselect']}&carselect={$_SESSION['carselect']}&lbselect=AllTopTimes'><button>Back to leaderboard</button></a></span><br><br>";
+echo "<br><br><a href='index.php?trackselect={$_SESSION['trackselect']}&carselect={$_SESSION['carselect']}&lbselect=AllTopTimes'><button>Back to leaderboard</button></a><br><br>";
+
+// Set nr of rivals
+echo "<form name='setrivalnr' METHOD='POST' ACTION='race.php' class='racetext'><input type='number' name='setrivalnr' min='0' max='19'><button type='submit'>Set nr of rivals</button></form>";
+if (isset($_POST['setrivalnr'])) {
+    $_SESSION['rivalnr'] = $_POST['setrivalnr'];
+	echo "<meta http-equiv='refresh' content='0'>";
+}
+
 
 // Buttons to turn on/off autoupdate
 echo "<span class='autoupdatebuttons'><form method='POST' action='race.php'>	
@@ -346,12 +354,6 @@ if ($_POST['autoupdate'] == 'Autoupdate off') {
 	
 echo "<span style='color:#ffffff'>Autoupdate is " . $_SESSION['autoupdate'] . "</span></span>";
 
-// Set nr of rivals
-echo "<span class='setrivalnr'><form name='setrivalnr' METHOD='POST' ACTION='race.php'><input type='number' name='setrivalnr' min='0' max='19'><button type='submit'>Set nr of rivals</button></form>";
-if (isset($_POST['setrivalnr'])) {
-    $_SESSION['rivalnr'] = $_POST['setrivalnr'];
-	echo "<meta http-equiv='refresh' content='0'>";
-}
 
 // Set track and vehicle
 $_SESSION['oldtrackselect'] = $_SESSION['trackselect'];
@@ -360,4 +362,5 @@ $_SESSION['oldcarselect'] = $_SESSION['carselect'];
 
 echo "</span>";
 echo "<span class='footer'>This page is not affiliated with Slightly Mad Studios.</span>";
+echo "</div>";
 echo "</div>";
