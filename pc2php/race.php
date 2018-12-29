@@ -150,13 +150,13 @@ for ($i = 0; $i < $_SESSION['rivalnr']; $i++){
 // This select gets lowest laptimes from players per car-track combo, accepting multiple player entries if in different cars (if 'Any car' is selected)
 $stmt = $mysqli->prepare("SELECT t1.* FROM laptimes t1
 JOIN (
-SELECT gamertag, track, vehicle, MIN(laptime) AS min_laptime
+SELECT gamertag, track, vehicle, vehicleclass, MIN(laptime) AS min_laptime
 FROM laptimes 
-WHERE track = ? AND vehicle LIKE ?
-GROUP BY gamertag, vehicle
-) AS t2 ON t1.gamertag = t2.gamertag AND t1.laptime = t2.min_laptime AND t1.track = t2.track AND t1.vehicle = t2.vehicle
+WHERE track = ? AND vehicle LIKE ? AND vehicleclass LIKE ?
+GROUP BY gamertag, vehicle, vehicleclass
+) AS t2 ON t1.gamertag = t2.gamertag AND t1.laptime = t2.min_laptime AND t1.track = t2.track AND t1.vehicle = t2.vehicle AND t1.vehicleclass = t2.vehicleclass
 ORDER BY laptime ASC"); 
-$stmt->bind_param("ss",$_SESSION['trackselect'],$_SESSION['carselect']); //s is for string
+$stmt->bind_param("sss",$_SESSION['trackselect'],$_SESSION['carselect'],$_SESSION['classelect']); //s is for string
 $stmt->execute();
 $result = $stmt->get_result();	
 $oldplayerrecord = $playerrecord; // Store old lap record before fetching possible new record
@@ -254,10 +254,10 @@ $playerdisplay = strtoupper($username);
 $playerdisplay = str_replace($search, $replace, $playerdisplay);
 
 // Set max lengths for names
-$worldrecordholder = substr($worldrecordholder,0,20);
-$playerdisplay = substr($playerdisplay,0,20);
+$worldrecordholder = substr($worldrecordholder,0,21);
+$playerdisplay = substr($playerdisplay,0,21);
 for ($i = 0; $i < $_SESSION['rivalnr']; $i++){	
-	$_SESSION['rival'][$i] = substr($_SESSION['rival'][$i],0, 20);
+	$_SESSION['rival'][$i] = substr($_SESSION['rival'][$i],0, 21);
 }
 
 // Check if player position is less than number of available rivals.
@@ -322,13 +322,21 @@ $blink=""; // reset $blink
 echo "<div class='racelogo'><img src='img/pcalc_logo.png' alt='<Project CALC logo'></div>";
 
 // Print current combo
-echo "<span id='racetext'>Current track is " . $_SESSION['trackselect'] . ".<br>Current car is " . $_SESSION['carselect'] . "</span>";
+echo "<span id='racetext'>Current track is " . $_SESSION['trackselect'];
+if ($_SESSION['carselect'] == "%%") { echo "<br>No car selected";}
+else {
+echo "<br>Current car is " . $_SESSION['carselect'];
+}
+if ($_SESSION['classelect'] == "%%") { echo "<br>No class selected";}
+else {
+echo "<br>Current class is " . $_SESSION['classelect'] . "</span>";
+}	
 
 // Return to leaderboard link
-echo "<br><br><a href='index.php?trackselect={$_SESSION['trackselect']}&carselect={$_SESSION['carselect']}&lbselect=AllTopTimes'><button>Back to leaderboard</button></a><br><br>";
+echo "<br><br><a href='index.php?trackselect={$_SESSION['trackselect']}&carselect={$_SESSION['carselect']}&classelect={$_SESSION['classelect']}&lbselect=AllTopTimes'><button>Back to leaderboard</button></a><br><br>";
 
 // Set nr of rivals
-echo "<form name='setrivalnr' METHOD='POST' ACTION='race.php' class='racetext'><input type='number' name='setrivalnr' min='0' max='19'><button type='submit'>Set nr of rivals</button></form>";
+echo "<form name='setrivalnr' METHOD='POST' ACTION='race.php' class='racetext'><input type='number' name='setrivalnr' min='0' max='29'><button type='submit'>Set nr of rivals</button></form>";
 if (isset($_POST['setrivalnr'])) {
     $_SESSION['rivalnr'] = $_POST['setrivalnr'];
 	echo "<meta http-equiv='refresh' content='0'>";

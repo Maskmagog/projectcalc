@@ -39,12 +39,14 @@ echo "Failed to connect to MySQL";
 /* Get variables, set wildcards if nothing choosen */
 $trackselect = isset($_GET['trackselect']) ? $_GET['trackselect'] : "%%" ; //Sent through URL
 $carselect = isset($_GET['carselect']) ? $_GET['carselect'] : "%%" ;
+$classelect = isset($_GET['classelect']) ? $_GET['classelect'] : "%%" ;
 $lbselect = isset($_GET['lbselect']) ? $_GET['lbselect'] : "%%" ; //leaderboard select, either AllTopTimes, TopPersonalTimes or AllPersonalTimes
 $page = isset($_GET['page']) ? $_GET['page'] : "" ;
 $selected = "";
 $playeralreadyfound=0;
 $_SESSION['trackselect'] = $trackselect;
 $_SESSION['carselect'] = $carselect;
+$_SESSION['classelect'] = $classelect;
 
 //***********************************************
 // Function to convert time format to 00:00.000 *
@@ -136,6 +138,7 @@ while ($row = $result->fetch_assoc()) {  // Loop through results, create track d
 $stmt->close();
 echo "<br></div>";
 
+
 //**********************
 /* vehicle select box */
 //*********************
@@ -163,6 +166,37 @@ echo "</select></div>";
 if (!empty($_GET['carselect'])) {
 	$carselect = $_GET['carselect'];
 }	
+
+
+
+//**********************
+/* class select box */
+//*********************
+echo "<div class='select'><select id='classelect' name='classelect' class='dropdown' width='200' style='width: 200px'>";
+echo "<option value='%%'>Any class</option>"; // Start with wildcards option, that shows laps for all classes at selected track
+
+// Prepare statement and fetch data
+$stmt = $mysqli->prepare("SELECT DISTINCT vehicleclass FROM laptimes ORDER BY vehicleclass ASC");
+$stmt->execute();
+$result = $stmt->get_result();
+/* Loop through results and make rows */
+while ($row = $result->fetch_assoc()) {  /* fetch the results into an array */
+
+    unset($class);
+    $class = $row['vehicleclass'];
+	if ($class == $_GET['classelect'] OR $class == $classelect){
+	$selected = 'selected="selected"'; }
+	else {$selected="";}
+					
+    echo '<option value="'.$class.'" ' . $selected . '>'.$class.'</option>';
+}
+$stmt->close();
+echo "</select></div>";
+
+if (!empty($_GET['classelect'])) {
+	$classelect = $_GET['classelect'];
+}	
+
 
 // Buttons for selecting AllTopTimes, TopPersonalTimes or AllPersonalTimes (in different div tags)						
 echo "<div class='button1'><button name='lbselect' type='submit' value='AllTopTimes'>Show leaderboard</button></div>
@@ -206,14 +240,14 @@ switch($_REQUEST['lbselect']) {
 // Player gamertag is stored in table user with id=1. Set from pc2udp script, which reads the gamertag from UDP
 $query = "SELECT t1.* FROM laptimes t1
 JOIN (
-SELECT gamertag, track, vehicle, MIN(laptime) AS min_laptime
+SELECT gamertag, track, vehicle, vehicleclass, MIN(laptime) AS min_laptime
 FROM laptimes 
-WHERE track = ? AND vehicle LIKE ?
+WHERE track = ? AND vehicle LIKE ? AND vehicleclass LIKE ?
 GROUP BY gamertag, vehicle
-) AS t2 ON t1.gamertag = t2.gamertag AND t1.laptime = t2.min_laptime AND t1.track = t2.track AND t1.vehicle = t2.vehicle
+) AS t2 ON t1.gamertag = t2.gamertag AND t1.laptime = t2.min_laptime AND t1.track = t2.track AND t1.vehicle = t2.vehicle AND t1.vehicleclass = t2.vehicleclass
 ORDER BY laptime ASC";
 $stmt = $mysqli->prepare($query);
-$stmt->bind_param("ss",$trackselect,$carselect); 
+$stmt->bind_param("sss",$trackselect,$carselect,$classelect); 
 $stmt->execute();
 $stmt->store_result();
 $total_rows = $stmt->num_rows;
@@ -234,13 +268,13 @@ else
 //*****************
 $stmt = $mysqli->prepare("SELECT t1.* FROM laptimes t1
 JOIN (
-SELECT gamertag, track, vehicle, MIN(laptime) AS min_laptime
+SELECT gamertag, track, vehicle, vehicleclass, MIN(laptime) AS min_laptime
 FROM laptimes 
-WHERE track = ? AND vehicle LIKE ?
+WHERE track = ? AND vehicle LIKE ? AND vehicleclass LIKE ?
 GROUP BY gamertag, vehicle
-) AS t2 ON t1.gamertag = t2.gamertag AND t1.laptime = t2.min_laptime AND t1.track = t2.track AND t1.vehicle = t2.vehicle
+) AS t2 ON t1.gamertag = t2.gamertag AND t1.laptime = t2.min_laptime AND t1.track = t2.track AND t1.vehicle = t2.vehicle AND t1.vehicleclass = t2.vehicleclass
 ORDER BY laptime ASC"); 
-$stmt->bind_param("ss",$trackselect,$carselect); //s is for string
+$stmt->bind_param("sss",$trackselect,$carselect,$classelect); //s is for string
 $stmt->execute();
 $result = $stmt->get_result();	
 $oldplayerrecord = $playerrecord; // Store old lap record before fetching possibly new record
@@ -275,7 +309,7 @@ if ($playerrow != "" AND $lbselect=='AllTopTimes') {
 	echo "<div class='position'>Your" . $bestifalltoptimes . " time: <strong>" . convertTo($playerrecord) . "</strong>. Your" . $bestifalltoptimes . " position: <strong>{$playerrow}</strong> out of <strong>{$total_rows}</strong>. Top {$pospercent}% ";
 	// Only show link to player page if it's not on first page
 	if (CEIL($total_rows/$limit) > 1 AND CEIL($playerrow/$limit) > 1 AND $playerrow > 3) {  // If total number of pages > 1 and players page > 1, then display pagelink
-		echo "Goto page: <a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&lbselect={$lbselect}&page=$playerpage\">$playerpage</a>"; // Create link to page player is on
+		echo "Goto page: <a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&classelect={$classelect}&lbselect={$lbselect}&page=$playerpage\">$playerpage</a>"; // Create link to page player is on
 	} 
 	elseif ($playerrow == 3){ echo "<strong>Bronze!</strong>";}
 	elseif ($playerrow == 2){ echo "<strong>Silver!/<strong>";}
@@ -298,32 +332,32 @@ switch($_REQUEST['lbselect']) {
 		$personalonly = "%%";
 		$stmt = $mysqli->prepare("SELECT t1.* FROM laptimes t1
 JOIN (
-SELECT gamertag, track, vehicle, MIN(laptime) AS min_laptime
+SELECT gamertag, track, vehicle, vehicleclass, MIN(laptime) AS min_laptime
 FROM laptimes 
-WHERE track = ? AND vehicle LIKE ?
-GROUP BY gamertag, vehicle
-) AS t2 ON t1.gamertag = t2.gamertag AND t1.laptime = t2.min_laptime AND t1.track = t2.track AND t1.vehicle = t2.vehicle
+WHERE track = ? AND vehicle LIKE ? AND vehicleclass LIKE ?
+GROUP BY gamertag, vehicle, vehicleclass
+) AS t2 ON t1.gamertag = t2.gamertag AND t1.laptime = t2.min_laptime AND t1.track = t2.track AND t1.vehicle = t2.vehicle AND t1.vehicleclass = t2.vehicleclass
 ORDER BY laptime ASC LIMIT ? OFFSET ?");
-		$stmt->bind_param("ssii", $trackselect,$carselect,$limit,$offset); //s is for string, i integer
+		$stmt->bind_param("sssii", $trackselect,$carselect,$classelect,$limit,$offset); //s is for string, i integer
                 break;
 	
 	case 'TopPersonalTimes': // Button Personal Top Laps is pressed = show best personal laps per car for selected track
 		$personalonly = $username;
 		$stmt = $mysqli->prepare("SELECT t1.* FROM laptimes t1
 JOIN (
-SELECT gamertag, track, vehicle, MIN(laptime) AS min_laptime
+SELECT gamertag, track, vehicle, vehicleclass, MIN(laptime) AS min_laptime
 FROM laptimes 
-WHERE track = ? AND gamertag LIKE ? 
-GROUP BY gamertag, vehicle
-) AS t2 ON t1.gamertag = t2.gamertag AND t1.laptime = t2.min_laptime AND t1.track = t2.track AND t1.vehicle = t2.vehicle
+WHERE track = ? AND gamertag LIKE ?  
+GROUP BY gamertag, vehicle, vehicleclass
+) AS t2 ON t1.gamertag = t2.gamertag AND t1.laptime = t2.min_laptime AND t1.track = t2.track AND t1.vehicle = t2.vehicle AND t1.vehicleclass = t2.vehicleclass
 ORDER BY laptime ASC LIMIT ? OFFSET ?");
 		$stmt->bind_param("ssii", $trackselect,$username,$limit,$offset); //s is for string
                 break;
 	
 	case 'AllPersonalTimes': // Button All Personal Laps is pressed = show all personal laps for selected car-track
 		$personalonly = $username;		
-		$stmt = $mysqli->prepare("SELECT * FROM laptimes WHERE track = ? AND vehicle LIKE ? AND gamertag LIKE ? ORDER BY laptime ASC LIMIT ? OFFSET ?");
-		$stmt->bind_param("sssii", $trackselect,$carselect,$username,$limit,$offset); //s is for string
+		$stmt = $mysqli->prepare("SELECT * FROM laptimes WHERE track = ? AND vehicle LIKE ? AND vehicleclass LIKE ? AND gamertag LIKE ? ORDER BY laptime ASC LIMIT ? OFFSET ?");
+		$stmt->bind_param("ssssii", $trackselect,$carselect,$classelect,$username,$limit,$offset); //s is for string
 				break;
 }
 //*************************
@@ -344,6 +378,7 @@ echo "<table width=100% border=0 color=#000000 cellpadding='5' cellspacing='5' i
 <th>Rank</th>
 <th>Player</th>
 <th>Car</th>
+<th>Class</th>
 <th>Lap</th>
 <th>Gap</th>
 <th>Date</th>
@@ -375,7 +410,7 @@ echo "<table width=100% border=0 color=#000000 cellpadding='5' cellspacing='5' i
 		$pagination .= "<div class=\"pagination\">";
 		//previous button
 		if ($page > 1) 
-			$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&lbselect={$lbselect}&page=$prev\">previous</a>";
+			$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&classelect={$classelect}&lbselect={$lbselect}&page=$prev\">previous</a>";
 		else
 			$pagination.= "<span class=\"disabled\">previous</span>";	
 		
@@ -387,7 +422,7 @@ echo "<table width=100% border=0 color=#000000 cellpadding='5' cellspacing='5' i
 				if ($counter == $page)
 					$pagination.= "<span class=\"current\">$counter</span>";
 				else
-					$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&lbselect={$lbselect}&page=$counter\">$counter</a>";					
+					$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&classelect={$classelect}&lbselect={$lbselect}&page=$counter\">$counter</a>";					
 			}
 		}
 		elseif($lastpage > 5 + ($adjacents * 2))	//enough pages to hide some
@@ -400,48 +435,48 @@ echo "<table width=100% border=0 color=#000000 cellpadding='5' cellspacing='5' i
 					if ($counter == $page)
 						$pagination.= "<span class=\"current\">$counter</span>";
 					else
-						$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&lbselect={$lbselect}&page=$counter\">$counter</a>";					
+						$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&classelect={$classelect}&lbselect={$lbselect}&page=$counter\">$counter</a>";					
 				}
 				$pagination.= "...";
-				$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&lbselect={$lbselect}&page=$lpm1\">$lpm1</a>";
-				$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&lbselect={$lbselect}&page=$lastpage\">$lastpage</a>";		
+				$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&classelect={$classelect}&lbselect={$lbselect}&page=$lpm1\">$lpm1</a>";
+				$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&classelect={$classelect}&lbselect={$lbselect}&page=$lastpage\">$lastpage</a>";		
 			}
 			//in middle; hide some front and some back
 			elseif($lastpage - ($adjacents * 2) > $page && $page > ($adjacents * 2))
 			{
-				$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&lbselect={$lbselect}&page=1\">1</a>";
-				$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&lbselect={$lbselect}&page=2\">2</a>";
+				$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&classelect={$classelect}&lbselect={$lbselect}&page=1\">1</a>";
+				$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&classelect={$classelect}&lbselect={$lbselect}&page=2\">2</a>";
 				$pagination.= "...";
 				for ($counter = $page - $adjacents; $counter <= $page + $adjacents; $counter++)
 				{
 					if ($counter == $page)
 						$pagination.= "<span class=\"current\">$counter</span>";
 					else
-						$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&lbselect={$lbselect}&page=$counter\">$counter</a>";					
+						$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&classelect={$classelect}&lbselect={$lbselect}&page=$counter\">$counter</a>";					
 				}
 				$pagination.= "...";
-				$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&lbselect={$lbselect}&page=$lpm1\">$lpm1</a>";
-				$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&lbselect={$lbselect}&page=$lastpage\">$lastpage</a>";		
+				$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&classelect={$classelect}&lbselect={$lbselect}&page=$lpm1\">$lpm1</a>";
+				$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&classelect={$classelect}&lbselect={$lbselect}&page=$lastpage\">$lastpage</a>";		
 			}
 			//close to end; only hide early pages
 			else
 			{
-				$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&lbselect={$lbselect}&page=1\">1</a>";
-				$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&lbselect={$lbselect}&page=2\">2</a>";
+				$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&classelect={$classelect}&lbselect={$lbselect}&page=1\">1</a>";
+				$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&classelect={$classelect}&lbselect={$lbselect}&page=2\">2</a>";
 				$pagination.= "...";
 				for ($counter = $lastpage - (2 + ($adjacents * 2)); $counter <= $lastpage; $counter++)
 				{
 					if ($counter == $page)
 						$pagination.= "<span class=\"current\">$counter</span>";
 					else
-						$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&lbselect={$lbselect}&page=$counter\">$counter</a>";					
+						$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&classelect={$classelect}&lbselect={$lbselect}&page=$counter\">$counter</a>";					
 				}
 			}
 		}
 		
 		//next button
 		if ($page < $counter - 1) 
-			$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&lbselect={$lbselect}&page=$next\">next</a>";
+			$pagination.= "<a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&classelect={$classelect}&lbselect={$lbselect}&page=$next\">next</a>";
 		else
 			$pagination.= "<span class=\"disabled\">next</span>";
 		$pagination.= "</div>\n";		
@@ -471,6 +506,7 @@ echo "<tr class='$class'>";
 echo "<td>" . $rank . ". $trophy</td>";
 echo "<td><a href='player.php?player=" . $row['gamertag'] . "'>" . $row['gamertag'] . "</a></td>"; // link to players complete laps
 echo "<td><a href='index.php?trackselect={$trackselect}&carselect={$row['vehicle']}&lbselect=AllTopTimes'>" . $row['vehicle'] . "</a></td>"; // link to leaderboard for that car
+echo "<td><a href='index.php?trackselect={$trackselect}&carselect=%%&classelect={$row['vehicleclass']}&lbselect=AllTopTimes'>" . $row['vehicleclass'] . "</a></td>"; // link to leaderboard for that class
 echo "<td><span class='tooltip'>" . convertTo($row['laptime']) . "<span class='tooltiptext'>S1:" . convertTo($row['sector1']) . " S2:" . convertTo($row['sector2']) . " S3:" . convertTo($row['sector3']) . "</span></span></td>"; /*convertTo-function formats time 00:00.000 */
 $lapTime = ($row['laptime']);
 if ($rank == 1) {$_SESSION['topTime'] = $lapTime;} // $rank=1 means it's the toptime, save it in Session variable, to calculate GAP on other pages 
@@ -490,6 +526,7 @@ if ($lbselect == "AllTopTimes") // Only show pagination buttons on normal leader
 {
 echo $pagination;
 }
+
 
 // Close db connection
 $stmt->close();
