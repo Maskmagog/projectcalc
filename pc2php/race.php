@@ -322,7 +322,7 @@ $blink=""; // reset $blink
 echo "<div class='racelogo'><img src='img/pcalc_logo.png' alt='<Project CALC logo'></div>";
 
 // Print current combo
-echo "<span id='racetext'>Current track is " . $_SESSION['trackselect'] . ". Current car is " . $_SESSION['carselect'] . "</span>";
+echo "<span id='racetext'>Current track is " . $_SESSION['trackselect'] . ".<br>Current car is " . $_SESSION['carselect'] . "</span>";
 
 // Return to leaderboard link
 echo "<br><br><a href='index.php?trackselect={$_SESSION['trackselect']}&carselect={$_SESSION['carselect']}&lbselect=AllTopTimes'><button>Back to leaderboard</button></a><br><br>";
