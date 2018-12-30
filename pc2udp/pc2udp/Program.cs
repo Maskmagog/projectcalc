@@ -28,6 +28,9 @@ namespace pc2udp
         private static string TrackLocation = "";
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
         private static string TrackVariation = "";
+        private static string TranslatedFullTrackLocation = "";
+        private static string TranslatedTrackLocation = "";
+        private static string TranslatedTrackVariation = "";
         private static double LastLapTimeSec = 0;
         private static double LastSector1TimeSec = 0;
         private static double LastSector2TimeSec = 0;
@@ -257,7 +260,7 @@ namespace pc2udp
             uDP.readPackets(); //Read Packets ever loop iteration
 
 
-            /* Do some testing to detect session restarts. maybe a function to reset values */
+            /* Detect session restarts. trigger a function to reset values */
             if (strRaceMode == "Not Started" & ValuesReset == 0) {
                 resetValues();
                 Console.WriteLine("Session restart/new session? Values reset.");
@@ -283,26 +286,45 @@ namespace pc2udp
                 //Console.WriteLine("FullTrackLocation is " + FullTrackLocation);
             }
 
-            //************************************************************
-            // Vehicle name and class id
-            //************************************************************
-            //Certain classes only have one character ahead of name, the other classes have 2
-            // Do a if else
-            // If (ClassName = bunch of classes) {SubIndex = 1}
-            //else { SubIndex = 2}
-            // then use SubIndex in SubString (instead of '2')
+                if (uDP._TranslatedTrackLocation != null)
+                {
+                    TranslatedTrackLocation = uDP.TranslatedTrackLocation;
+                    //Console.WriteLine("Track location is " + TrackLocation);
+                    TranslatedTrackLocation = TranslatedTrackLocation.Replace("_", " ");
+
+                    //Track Variation
+                    TranslatedTrackVariation = uDP.TranslatedTrackVariation;
+                    //Console.WriteLine("Track variation is " + TrackVariation);
+                    TranslatedTrackVariation = TranslatedTrackVariation.Replace("_", " ");
+
+                    // Concatenate tracklocation2 and trackvariation 
+                    TranslatedFullTrackLocation = TranslatedTrackLocation + " " + TranslatedTrackVariation;
+                    //Console.WriteLine("FullTrackLocation is " + FullTrackLocation);
+                }
+
+                //************************************************************
+                // Vehicle name and class id
+                //************************************************************
+                //Certain classes only have one character ahead of name, the other classes have 2
+                // Do a if else
+                // If (ClassName = bunch of classes) {SubIndex = 1}
+                //else { SubIndex = 2}
+                // then use SubIndex in SubString (instead of '2')
 
                 int SubIndex = 2;
-                if (uDP.VehicleClass != 0 && uDP.VehicleName != null)
-                {
-                    var list = new List<uint> { 3357278208, 151060480, 2156134400, 1158676480, 3747282944, 2585198592, 409534464, 3673882624, 1859780608, 2841116672, 349979920}; //These classes only have 1 character ahead of name
-                    var exists = list.Contains(uDP.VehicleClass);
 
+                if (uDP.VehicleClass != 0 && uDP.VehicleName != null)
+               {
+                    var list = new List<uint> { 3357278208, 151060480, 2156134400, 1158676480, 2585198592, 1859780608, 2841116672, 349979920}; //These classes only have 1 character ahead of name
+                    var exists = list.Contains(uDP.VehicleClass);
+            
                     if (exists == true) // if uDP.Vehicle class index is found in list above...
                     {
                         SubIndex = 1; // ...then set SubIndex to = 1
                     }
                 }
+
+                // Get name for Ginetta GT5, which seams to be blank?
                 if (uDP.VehicleIndex == 132) { VehicleName = "Ginetta G40 GT5"; } // For some reason, uDP.VehicleName is blank for this car
 
                 if (uDP.VehicleName != null && VehicleName != "Ginetta G40 GT5")
@@ -311,6 +333,7 @@ namespace pc2udp
                     VehicleName = ((uDP.VehicleName).Substring(SubIndex));
                     //Console.WriteLine("VehicleName is " + VehicleName);     // VehicleName after SubString
                     //Console.WriteLine("ClassINdex is " + uDP.VehicleClass);     // ClassIndex
+                    //Console.WriteLine("VehicleIndex is " + uDP.VehicleIndex);
                 }
                 // Vehicle class
                 if (uDP.VehicleClass == 151060480) { VehicleClass = "GTO"; }
@@ -329,41 +352,40 @@ namespace pc2udp
                 if (uDP.VehicleClass == 1158676480) { VehicleClass = "CanAm"; }
                 if (uDP.VehicleClass == 3614507008) { VehicleClass = "RXLites"; }
                 if (uDP.VehicleClass == 2841116672) { VehicleClass = "TC1"; }
-                if (uDP.VehicleClass == 409534464) { VehicleClass = "Touring Car"; }
-                if (uDP.VehicleClass == 2381971456) { VehicleClass = "Vintage Prototype A"; }
-                if (uDP.VehicleClass == 1155465216) { VehicleClass = "Vintage Prototype B"; }
-                if (uDP.VehicleClass == 1636630528) { VehicleClass = "Vintage RX"; }
-                if (uDP.VehicleClass == 1476722688) { VehicleClass = "Vintage Touring-GT A"; }
-                if (uDP.VehicleClass == 2908356608) { VehicleClass = "Vintage Touring-GT B"; }
-                if (uDP.VehicleClass == 1973682176) { VehicleClass = "Vintage Touring-GT C)"; }
-                if (uDP.VehicleClass == 1233584128) { VehicleClass = "Vintage-Touring-GT D"; }
-                if (uDP.VehicleClass == 1859780608) { VehicleClass = "Track Day B"; }
-                if (uDP.VehicleClass == 3239051264) { VehicleClass = "Track Day A"; }
-                if (uDP.VehicleClass == 3673882624) { VehicleClass = "Ferrari Series"; }
-                if (uDP.VehicleClass == 559480832) { VehicleClass = "Ferrari F355 Series"; }
+                if (uDP.VehicleClass == 409534464) { VehicleClass = "TC"; }
+                if (uDP.VehicleClass == 2381971456) { VehicleClass = "VP A"; }
+                if (uDP.VehicleClass == 1155465216) { VehicleClass = "VP B"; }
+                if (uDP.VehicleClass == 1636630528) { VehicleClass = "V RX"; }
+                if (uDP.VehicleClass == 1476722688) { VehicleClass = "VGT A"; }
+                if (uDP.VehicleClass == 2908356608) { VehicleClass = "VGT B"; }
+                if (uDP.VehicleClass == 1973682176) { VehicleClass = "VGT C"; }
+                if (uDP.VehicleClass == 1233584128) { VehicleClass = "VGT D"; }
+                if (uDP.VehicleClass == 3239051264) { VehicleClass = "Trackday A"; }
+                if (uDP.VehicleClass == 1859780608) { VehicleClass = "Trackday B"; }
+                if (uDP.VehicleClass == 3673882624) { VehicleClass = "Ferrari"; }
+                if (uDP.VehicleClass == 559480832) { VehicleClass = "F355 Series"; }
                 if (uDP.VehicleClass == 3747282944) { VehicleClass = "Indycar"; }
                 if (uDP.VehicleClass == 3361865728) { VehicleClass = "F5"; }
-                if (uDP.VehicleClass == 788135936) { VehicleClass = "Formula C)"; }
-                if (uDP.VehicleClass == 2156134400) { VehicleClass = "Formula Renault"; }
-                if (uDP.VehicleClass == 4294443008) { VehicleClass = "Formula A"; }
-                if (uDP.VehicleClass == 836239360) { VehicleClass = "Formula X"; }
-                if (uDP.VehicleClass == 308084736) { VehicleClass = "V8 Supercars"; }
-                if (uDP.VehicleClass == 2669346816) { VehicleClass = "Vintage F1A"; }
-                if (uDP.VehicleClass == 2635988992) { VehicleClass = "Vintage F1B"; }
-                if (uDP.VehicleClass == 1596850176) { VehicleClass = "Vintage F1C"; }
-                if (uDP.VehicleClass == 1984233472) { VehicleClass = "Vintage F1D"; }
-                if (uDP.VehicleClass == 309395456) { VehicleClass = "Vintage F3 A"; }
-                if (uDP.VehicleClass == 2864316416) { VehicleClass = "Vintage Indycar"; }
-                if (uDP.VehicleClass == 1233584128) { VehicleClass = "Vintage-Touring-GT D"; }
+                if (uDP.VehicleClass == 788135936) { VehicleClass = "FC"; }
+                if (uDP.VehicleClass == 2156134400) { VehicleClass = "FR35"; }
+                if (uDP.VehicleClass == 4294443008) { VehicleClass = "FA"; }
+                if (uDP.VehicleClass == 836239360) { VehicleClass = "FX"; }
+                if (uDP.VehicleClass == 308084736) { VehicleClass = "V8"; }
+                if (uDP.VehicleClass == 2669346816) { VehicleClass = "V F1A"; }
+                if (uDP.VehicleClass == 2635988992) { VehicleClass = "V F1B"; }
+                if (uDP.VehicleClass == 1596850176) { VehicleClass = "V F1C"; }
+                if (uDP.VehicleClass == 1984233472) { VehicleClass = "V F1D"; }
+                if (uDP.VehicleClass == 309395456) { VehicleClass = "V F3 A"; }
+                if (uDP.VehicleClass == 2864316416) { VehicleClass = "V Indy"; }
                 if (uDP.VehicleClass == 3645046784) { VehicleClass = "Drift"; }
                 if (uDP.VehicleClass == 2183659520) { VehicleClass = "Kart"; }
-                if (uDP.VehicleClass == 1424818176) { VehicleClass = "LMP1 2016 (LMPH)"; }
+                if (uDP.VehicleClass == 1424818176) { VehicleClass = "LMP1 2016"; }
                 if (uDP.VehicleClass == 3294560256) { VehicleClass = "LMP 900"; }
                 if (uDP.VehicleClass == 2251096064) { VehicleClass = "LMP1"; }
                 if (uDP.VehicleClass == 3502637056) { VehicleClass = "LMP2"; }
                 if (uDP.VehicleClass == 437256192) { VehicleClass = "LMP3"; }
                 if (uDP.VehicleClass == 1250557952) { VehicleClass = "Mégane Trophy"; }
-                if (uDP.VehicleClass == 843186176) { VehicleClass = "Modern Stockcar"; }
+                if (uDP.VehicleClass == 843186176) { VehicleClass = "Stockcar"; }
                 if (uDP.VehicleClass == 3707043840) { VehicleClass = "Road A"; }
                 if (uDP.VehicleClass == 2258239488) { VehicleClass = "Road B"; }
                 if (uDP.VehicleClass == 2110521344) { VehicleClass = "Road C"; }
@@ -377,17 +399,48 @@ namespace pc2udp
                 if (uDP.VehicleClass == 335872000) { VehicleClass = "WRX"; }
 
                 //Correct naming errors in vehicles and tracks
-                if (VehicleName == "RenaultMeganeRSSMSRTouring") { VehicleName = "Renault Mégane R.S. SMS-R Touring";}
+                if (VehicleName == "RenultMeganeRSSMSRTouring") { VehicleName = "Renault Megane R.S. SMS-R Touring"; }
                 if (VehicleName == "RenaultMeganeTrophyV6") { VehicleName = "Renault Mégane Trophy V6"; }
                 if (VehicleName == "LamborghiniHuracanLP6202SuperTrofeo") { VehicleName = "Lamborghini Huracan LP620-2 Super Trofeo"; }
                 if (VehicleName == "BMW1SeriesMCoupeStanceWorksEdition") { VehicleName = "BMW 1 Series M Coupe StanceWorks Edition"; }
                 if (VehicleName == "Honda24Concept") { VehicleName = "Honda 2&4 Concept"; }
-                if (VehicleName == "Mercedes-AMG A 45 SMS-R Touring") { VehicleName = "Mercedes-AMG A 45 SMS-R Touring";  }
+                if (VehicleName == "Mercedes-AMG A 45 SMS-R Touring") { VehicleName = "Mercedes-AMG A 45 SMS-R Touring"; }
+                if (VehicleName == "Opel Astra TCR") { VehicleName = "Opel Astra TCR"; }
+                if (FullTrackLocation == "Algarve ") { FullTrackLocation = "Autodromo Internacional do Algarve"; } //Whitespace
+                if (FullTrackLocation == "Barcelona Catalunya GP") { FullTrackLocation = "Circuit de Barcelona-Catalunya GP"; }
+                if (FullTrackLocation == "Barcelona Catalunya National") { FullTrackLocation = "Circuit de Barcelona-Catalunya National"; }
+                if (FullTrackLocation == "Barcelona Catalunya Club") { FullTrackLocation = "Circuit de Barcelona-Catalunya Club"; }
+                if (FullTrackLocation == "Brands Hatch Rallycross") { FullTrackLocation = "Brands Hatch Classic Rallycross"; }
+                if (FullTrackLocation == "DirtFish Stage1") { FullTrackLocation = "DirtFish Pro Rallycross Course"; } 
+                if (FullTrackLocation == "DirtFish Stage2") { FullTrackLocation = "DirtFish Boneyard Course"; }
+                if (FullTrackLocation == "DirtFish Stage3") { FullTrackLocation = "DirtFish Pro Rallycross Course"; } //Game bug: 'DirtFish Stage3' sent for both Pro Rallycross Course and Mill Run :(
                 if (FullTrackLocation == "SUGO GP") { FullTrackLocation = "Sportsland SUGO"; }
-                if (FullTrackLocation == "Laguna Seca ") { FullTrackLocation = "Mazda Raceway Laguna Seca"; }
+                if (FullTrackLocation == "Spa Francorchamps GP") { FullTrackLocation = "Circuit de Spa-Francorchamps GP"; }
+                if (FullTrackLocation == "Spa Francorchamps Historic GP") { FullTrackLocation = "Circuit de Spa-Francorchamps Historic"; }
+                if (FullTrackLocation == "Laguna Seca ") { FullTrackLocation = "Mazda Raceway Laguna Seca"; } //Whitespace
                 if (FullTrackLocation == "Snetterton 100 Circuit") { FullTrackLocation = "Snetterton 100"; }
                 if (FullTrackLocation == "Snetterton 200 Circuit") { FullTrackLocation = "Snetterton 200"; }
                 if (FullTrackLocation == "Snetterton 300 Circuit") { FullTrackLocation = "Snetterton 300"; }
+                if (FullTrackLocation == "Rouen ") { FullTrackLocation = "Rouen Les Essarts"; } //Whitespace
+                if (FullTrackLocation == "Rouen Short") { FullTrackLocation = "Rouen Les Essarts Short"; }
+                if (FullTrackLocation == "Monza GP") { FullTrackLocation = "Autodromo Nazionale Monza GP"; }
+                if (FullTrackLocation == "Monza Short") { FullTrackLocation = "Autodromo Nazionale Monza Short"; }
+                if (FullTrackLocation == "Monza Classic GP") { FullTrackLocation = "Autodromo Nazionale Monza GP Historic"; }
+                if (FullTrackLocation == "Monza Classic Historic Oval") { FullTrackLocation = "Autodromo Nazionale Monza Oval Historic"; }
+                if (FullTrackLocation == "Monza Classic Historic Mix") { FullTrackLocation = "Autodromo Nazionale Monza Oval + GP Historic"; }
+                if (FullTrackLocation == "Hell Rallycross") { FullTrackLocation = "Lankebanen Rallycross"; }
+                if (FullTrackLocation == "Imola GP") { FullTrackLocation = "Autodromo Internazionale Enzo E Dino Ferrari Imola"; }
+                if (FullTrackLocation == "Le Mans Le Mans Bugatti Circuit") { FullTrackLocation = "Le Mans Bugatti Circuit"; }
+                if (FullTrackLocation == "Le Mans Kart Int Le Mans International Karting Circuit") { FullTrackLocation = "Le Mans International Karting Circuit"; }
+                if (FullTrackLocation == "Lydden Hill Circuit") { FullTrackLocation = "Lydden Hill GP"; }
+
+
+                // Bug: Hockenheim Rallycross is sent as Hockenheim Short :( (Translated name: Hockenheimring Short)
+                // Bug: 'DirtFish Stage3' sent for both Pro Rallycross Course and Mill Run :(
+
+
+                // Get names for certain cars
+                if (uDP.VehicleIndex == 104) { VehicleName = "Renault Megane R.S. SMS-R Touring"; } // For some reason, this is not fixed by 'if' above
 
                 //************************************************************
                 // Vehicle class name
@@ -408,6 +461,7 @@ namespace pc2udp
                     Console.WriteLine("Current vehicle is " + VehicleName);
                     Console.WriteLine("Current class is " + VehicleClass);
                     Console.WriteLine("VehicleClass is " + uDP.VehicleClass);
+                    Console.WriteLine("Translated track full name is " + TranslatedFullTrackLocation);
                     dbCurrentCarTrack();
                 }
 
@@ -426,13 +480,7 @@ namespace pc2udp
                     Console.WriteLine("Lap invalidated, strRaceMode");
                 }
 
-                if (strSessionMode == "Invalid" && CurrentLapValid == "Y")
-                {
-                    CurrentLapValid = "N";
-                    Console.WriteLine("Lap invalidated, srtSessionMode");
-                }
-
-             
+                          
                 // RaceState
                 RaceState = (uDP.ParticipantInfo[uDP.ViewedParticipantIndex, 12]);
                 // Console.WriteLine("RaceState is " + RaceState);
@@ -604,7 +652,10 @@ namespace pc2udp
                                 else { Console.WriteLine("New lap record, but unfortunately invalid lap"); }
                             }
                             else { AllTimeRecord = "N"; }
-                            dbSendLapToDb(); // Send the lap to MariaDB
+                            if (LastLapValid == "Y") // Only send valid laps to db
+                            {
+                                dbSendLapToDb(); // Send the lap to MariaDB
+                            }
                             CurrentLapValid = "Y"; // Reset CurrentLapValid
                             OldLapTimeSec = LastLapTimeSec; // Store the last lap time in variable for later comparisons
                         }
