@@ -283,7 +283,7 @@ if ($playerrow == 1)
 echo "<div class='racepage' id='racepageid'>
 <table>
 <tbody><tr>
-<td width='8%' align='right'>1. </td>
+<td width='10%' align='right'>1. </td>
 <td><div class='racepagename'>" . $worldrecordholder . "</div></td> 
 <td align='right' width='20%'>" . convertTo($worldrecord) . "</td>"; // World record time
 if ($playerrecord == 0) {

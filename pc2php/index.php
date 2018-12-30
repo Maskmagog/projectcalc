@@ -172,7 +172,7 @@ if (!empty($_GET['carselect'])) {
 //**********************
 /* class select box */
 //*********************
-echo "<div class='select'><select id='classelect' name='classelect' class='dropdown' width='200' style='width: 200px'>";
+echo "<div class='select'><select id='classelect' name='classelect' class='dropdown' width='100' style='width: 100px'>";
 echo "<option value='%%'>Any class</option>"; // Start with wildcards option, that shows laps for all classes at selected track
 
 // Prepare statement and fetch data
@@ -208,6 +208,9 @@ echo "<div class='button1'><button name='lbselect' type='submit' value='AllTopTi
 //************************
 echo "<div class='search'><form action='/player.php' method='get'><input type='text' name='player' size='10' placeholder='search for player'><input type='submit' value='Search'>
 </form></div>";
+
+// Reset button
+echo "<div class='search'><a href='index.php?trackselect=%%&carselect=%%&classelect=%%lbselect=AllTopTimes'><button>Reset</button></a></div>";
 
 //*****************************************************************	
 // Get gamertag: Prepare sql statement, bind parameters, fetch data
@@ -312,7 +315,7 @@ if ($playerrow != "" AND $lbselect=='AllTopTimes') {
 		echo "Goto page: <a href=\"$targetpage?trackselect={$trackselect}&carselect={$carselect}&classelect={$classelect}&lbselect={$lbselect}&page=$playerpage\">$playerpage</a>"; // Create link to page player is on
 	} 
 	elseif ($playerrow == 3){ echo "<strong>Bronze!</strong>";}
-	elseif ($playerrow == 2){ echo "<strong>Silver!/<strong>";}
+	elseif ($playerrow == 2){ echo "<strong>Silver!</strong>";}
 	elseif ($playerrow == 1){ echo "<span class='blink'><strong>WORLD RECORD!</strong></span>";}
 	elseif ($playerrow < 6){ echo "<strong>Top five!</strong>";}
 	elseif ($playerrow < 11){ echo "<strong>Top ten!</strong>";}
