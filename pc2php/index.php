@@ -1,9 +1,20 @@
+<!-- ******************************************
+// Project CALC - by Martin Holmström
+// maskmagog@gmail.com
+// https://github.com/Maskmagog/projectcalc
+//
+// Feel free to use the program(s) 
+// but don't make money on it.
+// Change/adapt/modify the code as you want
+// but keep these lines. Thank you.
+//***************************************** -->
 <?php
 session_start(); // Start php session to keep session variables
 //$sessionfile = ini_get('session.save_path') . '/' . 'sess_'.session_id();  
 //echo 'session file: ', $sessionfile, ' ';  
 //echo 'size: ', filesize($sessionfile), "\n";
 ?>
+
 <html>
 <head>
 <title>Project CALC - Community Assisted Leaderboards for Consoles - Project CARS 2</title>
@@ -510,7 +521,7 @@ echo "<td>" . $rank . ". $trophy</td>";
 echo "<td><a href='player.php?player=" . $row['gamertag'] . "'>" . $row['gamertag'] . "</a></td>"; // link to players complete laps
 echo "<td><a href='index.php?trackselect={$trackselect}&carselect={$row['vehicle']}&lbselect=AllTopTimes'>" . $row['vehicle'] . "</a></td>"; // link to leaderboard for that car
 echo "<td><a href='index.php?trackselect={$trackselect}&carselect=%%&classelect={$row['vehicleclass']}&lbselect=AllTopTimes'>" . $row['vehicleclass'] . "</a></td>"; // link to leaderboard for that class
-echo "<td><span class='tooltip'>" . convertTo($row['laptime']) . "<span class='tooltiptext'>S1:" . convertTo($row['sector1']) . " S2:" . convertTo($row['sector2']) . " S3:" . convertTo($row['sector3']) . "</span></span></td>"; /*convertTo-function formats time 00:00.000 */
+echo "<td><span class='tooltip'>" . convertTo($row['laptime']) . "<span class='tooltiptext'>S1: " . convertTo($row['sector1']) . " S2: " . convertTo($row['sector2']) . " S3: " . convertTo($row['sector3']) . "</span></span></td>"; /*convertTo-function formats time 00:00.000 */
 $lapTime = ($row['laptime']);
 if ($rank == 1) {$_SESSION['topTime'] = $lapTime;} // $rank=1 means it's the toptime, save it in Session variable, to calculate GAP on other pages 
 $diff = ($lapTime) - ($_SESSION['topTime']); // Calculate GAP to top time
@@ -543,6 +554,11 @@ $("#sortTable").tablesorter();
 );
 </script>
 <span class="footer">This page is not affiliated with Slightly Mad Studios.</span>
+
+<a href="settings.php">
+	<img src="img/cogwheel.png" alt="settings" style="width:15px;height:15px;"> settings
+</a>
+
 </div>
 </body>
 </html>

@@ -1,3 +1,13 @@
+<!-- ******************************************
+// Project CALC - by Martin Holmström
+// maskmagog@gmail.com
+// https://github.com/Maskmagog/projectcalc
+//
+// Feel free to use the program(s) 
+// but don't make money on it.
+// Change/adapt/modify the code as you want
+// but keep these lines. Thank you.
+//***************************************** -->
 <html>
 <head>
 <title>Project CALC - Community Assisted Leaderboards for Consoles - Project CARS 2</title>

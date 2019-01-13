@@ -1,3 +1,13 @@
+<!-- ******************************************
+// Project CALC - by Martin Holmström
+// maskmagog@gmail.com
+// https://github.com/Maskmagog/projectcalc
+//
+// Feel free to use the program(s) 
+// but don't make money on it.
+// Change/adapt/modify the code as you want
+// but keep these lines. Thank you.
+//***************************************** -->
 <?php
 session_start();?> 
 <html>
@@ -16,6 +26,12 @@ session_start();?>
 //echo 'size: ', filesize($sessionfile), "\n";
 // Wrapper class to control page width etc. See main.css
 echo "<div id='racemodewrapper'>";
+
+/* Get variables, set wildcards if nothing choosen */
+if (empty($_SESSION['carselect']))
+{ $_SESSION['carselect'] = "%%"; }
+if (empty($_SESSION['classelect']))
+{ $_SESSION['classelect'] = "%%"; }
 
 //**********************
 // Connect to database *
@@ -329,7 +345,7 @@ echo "<br>Current car is " . $_SESSION['carselect'];
 }
 if ($_SESSION['classelect'] == "%%") { echo "<br>No class selected";}
 else {
-echo "<br>Current class is " . $_SESSION['classelect'] . "</span>";
+echo "<br>Current class is " . $_SESSION['classelect'];
 }	
 
 // Return to leaderboard link
