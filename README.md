@@ -1,6 +1,9 @@
 # projectcalc
 Project Cars 2 personal leaderboards for consoles. Receives UDP from game, and scrapes Steam leaderboards.
 
+Easiest way to get this: Get a Raspberry Pi, download compressed image file from here: https://www.dropbox.com/s/y4nv2lah27psxml/projectcalc_190113.img?dl=0
+Write image file to sdhc card, and boot the Pi. Must be on same network as Xbox or PS4 running Project CARS 2.
+
 Project CALC - Community Assisted Leaderboards for Console
 
 We all know the state of console leaderboards for Project CARS 2. So with some great help from others, I've built a solution, that runs on a Raspberry Pi, and saves all your laps (laptime, sector times etc). 
