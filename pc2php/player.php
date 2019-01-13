@@ -7,7 +7,7 @@
 // but don't make money on it.
 // Change/adapt/modify the code as you want
 // but keep these lines. Thank you.
-// test
+// test2
 //***************************************** -->
 <html>
 <head>
