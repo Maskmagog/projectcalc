@@ -1,6 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
+# ******************************************
+# Project CALC - by Martin Holmström
+# maskmagog@gmail.com
+# https://github.com/Maskmagog/projectcalc
+#
+# Scraper by Jonas Gulle
+# Modified by Martin Holmström
+# Feel free to use the program(s) 
+# but don't make money on it.
+# Change/adapt/modify the code as you want
+# but keep these lines. Thank you.
+# ******************************************
+
 from bs4 import BeautifulSoup, Tag
 from urllib2 import urlopen
 from operator import itemgetter
@@ -98,12 +111,12 @@ class ProjectCARS2(object):
 			setup = tr.find('td', {'class': 'assists'}).img.get('alt')
 			setup = setup[7:]
 			
-			#Get controller: Wheel, Gamepad or Keyboard
+			# Get controller: Wheel, Gamepad or Keyboard
 			global controller
 			controller = tr.findAll('img')[2]['title']
 			controller = controller[12:]
 				
-			#Get camera: In-car or External
+			# Get camera: In-car or External
 			global camera
 			camera = tr.findAll('img')[3]['title']
 			camera = camera[8:]
@@ -146,27 +159,27 @@ class ProjectCARS2(object):
 		print(cur.rowcount, "record inserted.")	
 		db.commit()
 		
-	#def print_leaderboard(self, lb):
+	def print_leaderboard(self, lb):
 		
-		#for row in lb:		
+		for row in lb:		
 			
-			#print "%s: %-25.25s %s %s %s" % (
-			#	row["rank"],
-			# 	row["user"],
-			# 	row["time"],
-			# 	row["vehicle"],
-			# 	row["gap"]
-			#)
+			print "%s: %-25.25s %s %s %s" % (
+				row["rank"],
+			 	row["user"],
+			 	row["time"],
+			 	row["vehicle"],
+			 	row["gap"]
+			)
 		
 def main():
 	pc2 = ProjectCARS2()
 	
 	# Download the complete leaderboard for selected entries
-	customtracks = {("Lydden Hill GP","953639515"),("Rouen Les Essarts Short","2779493388"),("Willow Springs International Raceway","4191654388"),("Long Beach Street Circuit","1731699995"),("DirtFish Boneyard Course","980779751"),("Daytona Road Course","467707118"),("Snetterton 300","1508903068"),("Snetterton 200","1058872832"),("Indianapolis Motor Speedway Oval","62242453"),("Hockenheim Short","1768660198"),("Hockenheim Classic GP","1552853772"),("24 Hours of Le Mans Circuit","1740968730"),("Zolder","3934256239"),("Watkins Glen International Short","1590386668"),("Sonoma Raceway National","3299764567"),("Sonoma Raceway GP","2840687665"),("Silverstone Classic GP","3100676468"),("Sakitto Sprint","3415685177"),("Sakitto National","3034141030"),("Sakitto GP","2535224250"),("Road America","3634666530"),("Rouen Les Essarts","3263717367"),("Red Bull Ring National","2280743555"),("Red Bull Ring GP","2361713765"),("Porsche Leipzig Full Circuit","4136123652"),("Oulton Park Island","2417267773"),("Nurburgring Nordschleife","697498609"),("Nurburgring GP","3348999902"),("Mugello GP","1730519219"), ("Lankebanen Rallycross","2087662703"),("Le Mans V Track","167552033"),("Knockhill National","1887425815"),("Knockhill International","2168579513"),("Classic Brands Hatch Rallycross","2239809056"),("Circuit de Spa-Francorchamps Historic","2490004715"),("Circuit de Spa-Francorchamps GP","904625875"),("Circuit de Barcelona-Catalunya GP","521933422"),("Brno GP","3387066030"),("Autodromo Internazionale Enzo E Dino Ferrari Imola","920145926"),("Brands Hatch Indy", "1300627020"),("Brands Hatch GP", "1988984740"),("Autodromo Internacional do Algarve", "3878349996"),("Bannochbrae Road Circuit", "3692283027"),("Mazda Raceway Laguna Seca", "2682943968"),("Oulton Park Fosters", "2273942801"),("Sportsland SUGO", "3270746104"),("Watkins Glen International GP", "2509185801"),("Oulton Park International", "545979690")}
-	customvehicles = {("Toyota GT-86","4059215692","Road G"), ("Porsche 935/77","1319185453","Group 5"),("Opel Astra TCR","3950216669","TC"), ("Nissan Skyline Super Silhouette","4016661190","Group 5"), ("Nissan Fairlady 240ZG GTS-II","1481115672","VGT A"),("Ford GT LM GTE","2438214702","GTE"),("Ferrari F40 LM","1015579264","GTO"),("Datsun 280ZX IMSA GTX","3406832937","Group 5"),("Renault Clio Cup","3646257473","TC1"),("Radical SR3-RS","1231996358","Trackday B"),("Porsche 961","3967020141","GTO"),("Porsche 924 Carrera GTP","4083384819","Group 4"),("Porsche 917K","2459830780","VP A"),("Porsche 917 LH","2765703167","VP A"),("Porsche 911 RSR","2999114098","GTE"),("Porsche 911 Carrera RSR 2.8","3487780088","VGT A"),("Porsche 908/03 Spyder","1218201782","VP B"),("Olsbergs MSE RX Supercar Lite","3715710369","RXLites"),("Mercedes-Benz 300 SEL 6.8 AMG","4209306796","VGT B"),("Mercedes-Benz 190E 2.5-16 Evolution 2 DTM","262982797","Group A"),("Mercedes-AMG A 45 SMS-R Touring","3019822479","TC"),("Lotus Type 72D Cosworth","2974350450","V F1C"),("Ford Mustang '66 RTR TransAm","3921573780","VGT A"),("Lotus Type 40 Ford","3090278997","VP B"),("Jaguar E-Type V12 Group44","3289024725","VGT A"),("Ginetta G40 Junior","310900789","G40 Junior"),("Ginetta G40 GT5","58065064","GT5"),("Formula Renault 3.5","1626504761","Formula Renault"),("Formula Rookie","2219682419","F5"),("Ford Mustang Cobra TransAm","4283632081","GTO"),("Ford MkIV","2520631554","VP B"),("Ford Escort RS1600 (Rallycross)","2498018106","V RX"),("Ford Escort RS1600","1639105598","Road G"),("Ford Escort RS1600 (Racing)","3679780595","VGT B"),("Ferrari F355 Challenge","2574370663","F355 Series"),("Ferrari 512 M","2463819442","VP A"),("Ferrari 512 BB LM","1317086096","Group 4"),("Ferrari 488 GTE","405826415","GTE"),("Ferrari 488 GT3","185812116","GT3"),("Ferrari 488 Challenge (EU)","1471547500","Ferrari"),("Ferrari 458 Speciale A","2006190056","Road B"),("Ferrari 365 GTB4 Competizione","696555869","VGT A"),("Ferrari 250 GT Berlinetta","3889953946","VGT C"),("Ferrari 330 P4","3959862335","VP B"),("Ferrari 288 GTO","2392626889","GTO"),("Dallara IR-12 Chevrolet (Speedway)","1818067169","Indycar"),("Dallara IR-12 Chevrolet (Road Course)","3912454102","Indycar"),("Chevrolet Camaro Z/28 '69 TransAm","728095309","VGT A"),("BMW M3 Sport Evo Group A","3360868789","Group A"),("BMW 320 Turbo Group 5","779111340","Group 5"),("BMW 320 TC","9503224","TC"),("BMW M1 Procar","1368036017","Group 4"),("BMW 2002 Turbo","143364290","Road G"),("BMW 2002 StanceWorks Edition","3107219035","VGT B"),("Audi V8 quattro DTM","3954590596","Group A"),("Audi 90 quattro IMSA GTO","1470929381","GTO"),("Audi R8 LMS","1934199723","GT3"),("Zakspeed Ford Capri Group 5","1817703058","Group 5"),("Renault Megane R.S. SMS-R Touring","2850335028","TC")}
+	customtracks = {("Lydden Hill GP","953639515"),("Rouen Les Essarts Short","2779493388"),("Willow Springs International Raceway","4191654388"),("Long Beach Street Circuit","1731699995"),("DirtFish Boneyard Course","980779751"),("Daytona Road Course","467707118"),("Snetterton 300","1508903068"),("Snetterton 200","1058872832"),("Indianapolis Motor Speedway Oval","62242453"),("Hockenheim Short","1768660198"),("Hockenheim Classic GP","1552853772"),("24 Hours of Le Mans Circuit","1740968730"),("Zolder","3934256239"),("Watkins Glen International Short","1590386668"),("Sonoma Raceway National","3299764567"),("Sonoma Raceway GP","2840687665"),("Silverstone Classic GP","3100676468"),("Sakitto Sprint","3415685177"),("Sakitto National","3034141030"),("Sakitto GP","2535224250"),("Road America","3634666530"),("Rouen Les Essarts","3263717367"),("Red Bull Ring National","2280743555"),("Red Bull Ring GP","2361713765"),("Porsche Leipzig Full Circuit","4136123652"),("Oulton Park Island","2417267773"),("Nürburgring Nordschleife","697498609"),("Nürburgring GP","3348999902"),("Mugello GP","1730519219"), ("Lankebanen Rallycross","2087662703"),("Le Mans Vintage Track","167552033"),("Knockhill National","1887425815"),("Knockhill International","2168579513"),("Brands Hatch Classic Rallycross","2239809056"),("Spa-Francorchamps Historic","2490004715"),("Spa-Francorchamps GP","904625875"),("Barcelona-Catalunya GP","521933422"),("Brno GP","3387066030"),("Imola","920145926"),("Brands Hatch Indy", "1300627020"),("Brands Hatch GP", "1988984740"),("Algarve", "3878349996"),("Bannochbrae Road Circuit", "3692283027"),("Mazda Raceway Laguna Seca", "2682943968"),("Oulton Park Fosters", "2273942801"),("Sportsland SUGO", "3270746104"),("Watkins Glen International GP", "2509185801"),("Oulton Park International", "545979690")}
+	customvehicles = {("Renault Alpine A442B","3595323626","Group 6"),("Nissan Skyline GT-R (BNR32) Group A","2136103830","Group A"),("Aston Martin DBR1/300","4203152210","VGT C"), ("Lotus Type 25 Climax","3581682802","V F1D"),("Toyota GT-86","4059215692","Road G"), ("Porsche 935/77","1319185453","Group 5"),("Opel Astra TCR","3950216669","TC"), ("Nissan Skyline Super Silhouette","4016661190","Group 5"), ("Nissan Fairlady 240ZG GTS-II","1481115672","VGT A"),("Ford GT LM GTE","2438214702","GTE"),("Ferrari F40 LM","1015579264","GTO"),("Datsun 280ZX IMSA GTX","3406832937","Group 5"),("Renault Clio Cup","3646257473","TC1"),("Radical SR3-RS","1231996358","Trackday B"),("Porsche 961","3967020141","GTO"),("Porsche 924 Carrera GTP","4083384819","Group 4"),("Porsche 917K","2459830780","VP A"),("Porsche 917 LH","2765703167","VP A"),("Porsche 911 RSR","2999114098","GTE"),("Porsche 911 Carrera RSR 2.8","3487780088","VGT A"),("Porsche 908/03 Spyder","1218201782","VP B"),("Olsbergs MSE RX Supercar Lite","3715710369","RXLites"),("Mercedes-Benz 300 SEL 6.8 AMG","4209306796","VGT B"),("Mercedes-Benz 190E 2.5-16 Evolution 2 DTM","262982797","Group A"),("Mercedes-AMG A 45 SMS-R Touring","3019822479","TC"),("Lotus Type 72D Cosworth","2974350450","V F1C"),("Ford Mustang '66 RTR TransAm","3921573780","VGT A"),("Lotus Type 40 Ford","3090278997","VP B"),("Jaguar E-Type V12 Group44","3289024725","VGT A"),("Ginetta G40 Junior","310900789","G40 Jr"),("Ginetta G40 GT5","58065064","GT5"),("Formula Renault 3.5","1626504761","FR35"),("Formula Rookie","2219682419","F5"),("Ford Mustang Cobra TransAm","4283632081","GTO"),("Ford MkIV","2520631554","VP B"),("Ford Escort RS1600 (Rallycross)","2498018106","V RX"),("Ford Escort RS1600","1639105598","Road G"),("Ford Escort RS1600 (Racing)","3679780595","VGT B"),("Ferrari F355 Challenge","2574370663","F355 Series"),("Ferrari 512 M","2463819442","VP A"),("Ferrari 512 BB LM","1317086096","Group 4"),("Ferrari 488 GTE","405826415","GTE"),("Ferrari 488 GT3","185812116","GT3"),("Ferrari 488 Challenge (EU)","1471547500","Ferrari"),("Ferrari 458 Speciale A","2006190056","Road B"),("Ferrari 365 GTB4 Competizione","696555869","VGT A"),("Ferrari 250 GT Berlinetta","3889953946","VGT C"),("Ferrari 330 P4","3959862335","VP B"),("Ferrari 288 GTO","2392626889","GTO"),("Dallara IR-12 Chevrolet (Speedway)","1818067169","Indycar"),("Dallara IR-12 Chevrolet (Road Course)","3912454102","Indycar"),("Chevrolet Camaro Z/28 '69 TransAm","728095309","VGT A"),("BMW M3 Sport Evo Group A","3360868789","Group A"),("BMW 320 Turbo Group 5","779111340","Group 5"),("BMW 320 TC (E90)","9503224","TC"),("BMW M1 Procar","1368036017","Group 4"),("BMW 2002 Turbo","143364290","Road G"),("BMW 2002 StanceWorks Edition","3107219035","VGT B"),("Audi V8 quattro DTM","3954590596","Group A"),("Audi 90 quattro IMSA GTO","1470929381","GTO"),("Audi R8 LMS","1934199723","GT3"),("Zakspeed Ford Capri Group 5","1817703058","Group 5"),("Renault Megane R.S. SMS-R Touring","2850335028","TC")}
 	# To add laptimes for a new car, uncomment and change the row(s) below, so no need to rescrape everything. Same can be done for a new track.
-	# customtracks = {} 
-	# customvehicles = {}
+	# customtracks = {("Nürburgring Nordschleife","697498609")} 
+	# customvehicles = {("Renault Alpine A442B","3595323626","Group 6")}
 	
 	# lb = pc2.get_leaderboard(1988984740, 1639105598) # NOT USED
 	# pc2.store_leaderboard(lb) # NOT USED
@@ -188,6 +201,7 @@ def main():
 				# print vehicle_id, track_id
 				lb = pc2.get_leaderboard(track_id, vehicle_id)
 				pc2.store_leaderboard(lb)
+			#except Exception as e: print(e)
 			except TypeError:
 				print "This leaderboard contains no data"
 				
@@ -212,19 +226,19 @@ if __name__ == "__main__":
 	
 	
 	
-
+# Rows marked with two ## are currently included in the scraper, row 178-179 above
 #   
 # ("Acura NSX","728234598","Road C"),
 # ("Acura NSX GT3","3416883430","GT3"), 
 # ("Agajanian Watson Roadster","2851776933","V Indy"), 
 # ("Aston Martin DB11","2991153806","Road D"), 
-# ("Aston Martin DBR1/300","4203152210","VGT C"), 
+## ("Aston Martin DBR1/300","4203152210","VGT C"), 
 # ("Aston Martin Vantage GT12","1268015922","Road C"), 
 # ("Aston Martin Vantage GT3","1452261378","GT3"), 
 # ("Aston Martin Vantage GT4","2086246081","GT4"), 
 # ("Aston Martin Vantage GTE","1401532035","GTE"), 
 # ("Aston Martin Vulcan","1682144078","Trackday A"), 
-# ("Audi 90 quattro IMSA GTO","1470929381","GTO"), 
+## ("Audi 90 quattro IMSA GTO","1470929381","GTO"), 
 ## ("Audi A1 quattro","2082176226","Road F"), 
 # ("Audi R18 (Fuji 2016)","3088285373","LMP1 2016"), 
 # ("Audi R18 (Le Mans 2016)","4054224091","LMP1 2016"), 
@@ -245,7 +259,7 @@ if __name__ == "__main__":
 # ("BMW 1 Series M Coupe StanceWorks Edition","2883643484","Road D"), 
 ## ("BMW 2002 StanceWorks Edition","3107219035","VGT B"), 
 ## ("BMW 2002 Turbo","143364290","Road G"), 
-## ("BMW 320 TC","9503224","TC"), 
+## ("BMW 320 TC (E90)","9503224","TC"), 
 ## ("BMW 320 Turbo Group 5","779111340","Group 5"), 
 ## ("BMW M1 Procar","1368036017","Group 4"), 
 # ("BMW M3 GT4 (E92)","2749517114","GT4"), 
@@ -312,11 +326,11 @@ if __name__ == "__main__":
 # ("Ford Sierra Cosworth RS500 Group A","3041492578","Group A"), 
 # ("Formula A","1909945073","FA"), 
 # ("Formula C","3253292325","FC"), 
-## ("Formula Renault 3.5","1626504761","FR3.5"), 
+## ("Formula Renault 3.5","1626504761","FR35"), 
 ## ("Formula Rookie","2219682419","F5"), 
 # ("Formula X","3855427461","FX"), 
 ## ("Ginetta G40 GT5","58065064","GT5"), 
-## ("Ginetta G40 Junior","310900789","G40 Junior"),
+## ("Ginetta G40 Junior","310900789","G40 Jr"),
 # ("Ginetta G55 GT3","3124293020","GT3"), 
 # ("Ginetta G55 GT4","2091910841","GT4"), 
 # ("Ginetta G57","1433352906","Trackday A"), 
@@ -388,7 +402,7 @@ if __name__ == "__main__":
 # ("Nissan R390 GT1","3951943788","GT1"), 
 # ("Nissan R89C","1891730007","Group C"), 
 # ("Nissan R89C LM","2533887208","Group C"), 
-# ("Nissan Skyline GT-R (BNR32) Group A","2136103830","Group A"), 
+## ("Nissan Skyline GT-R (BNR32) Group A","2136103830","Group A"), 
 # ("Nissan Skyline GT-R (R34) SMS-R","3991375490","Trackday B"), 
 ## ("Nissan Skyline Super Silhouette","4016661190","Group 5"), 
 ## ("Olsbergs MSE RX Supercar Lite","3715710369","RXLites"), 
@@ -426,7 +440,7 @@ if __name__ == "__main__":
 # ("Radical SR3-RS","1231996358","Trackday B"), 
 # ("Radical SR8-RX","152867459","Trackday A"), 
 # ("Renault 5 Maxi Turbo","3627124995","Group B"), 
-# ("Renault Alpine A442B","3595323626","Group 6"), 
+## ("Renault Alpine A442B","3595323626","Group 6"), 
 ## ("Renault Clio Cup","3646257473","TC1"), 
 # ("Renault Megane R.S. 275 Trophy-R","3338086070","Road F"), 
 # ("Renault Megane R.S. SMS-R Rallycross","556202917","WRX"), 
@@ -451,13 +465,7 @@ if __name__ == "__main__":
 
 # 
 ## ("24 Hours of Le Mans Circuit","1740968730"),
-## ("Autodromo Internazionale Enzo E Dino Ferrari Imola","920145926"),
-# ("Autodromo Nazionale Monza GP","4241994684"),
-# ("Autodromo Nazionale Monza GP Historic","1184596327"),
-# ("Autodromo Nazionale Monza Historic Oval + GP Mix","1327182267"),
-# ("Autodromo Nazionale Monza Oval Historic","4131920659"),
-# ("Autodromo Nazionale Monza Short","368740158"),
-## ("Autodromo Internacional do Algarve","3878349996"),
+## ("Algarve","3878349996"),
 # ("Azure Circuit","832629329"),
 # ("Azure Coast","560711985"),
 # ("Azure Coast Stage 1","550129415"),
@@ -465,8 +473,12 @@ if __name__ == "__main__":
 # ("Azure Coast Stage 3","2557706171"),
 # ("Azure Coast Westbound","2358176792"),
 ## ("Bannochbrae Road Circuit","3692283027"),
+# ("Barcelona-Catalunya Club","3252038398"),
+##("Barcelona-Catalunya GP","521933422"),
+# ("Barcelona-Catalunya National","3296775302"),
 # ("Barcelona Rallycross","1828877100"),
 # ("Bathurst Mount Panorama","921120824"),
+## ("Brands Hatch Classic Rallycross","2239809056"),
 ## ("Brands Hatch GP","1988984740"),
 ## ("Brands Hatch Indy","1300627020"),
 ## ("Brno GP","3387066030"),
@@ -479,18 +491,12 @@ if __name__ == "__main__":
 # ("California Highway Stage 2","940391868"),
 # ("California Highway Stage 3","3963464445"),
 # ("Chesterfield Karting Circuit","2559054883"),
-# ("Circuit de Barcelona-Catalunya Club","3252038398"),
-##("Circuit de Barcelona-Catalunya GP","521933422"),
-# ("Circuit de Barcelona-Catalunya National","3296775302"),
-## ("Circuit de Spa-Francorchamps GP","904625875"),
-## ("Circuit de Spa-Francorchamps Historic","2490004715"),
 # ("Circuit of the Americas Club","802214179"),
 # ("Circuit of the Americas GP","2050315946"),
 # ("Circuit of the Americas National","1629467388"),
-## ("Brands Hatch Classic Rallycross","2239809056"),
-# ("Daytona International Speedway Rallycross","35770107"),
-# ("Daytona International Speedway Tri-Oval","2054003546"),
-## ("Daytona International Speedway Road Course","467707118"),
+# ("Daytona Rallycross","35770107"),
+# ("Daytona Speedway Tri-Oval","2054003546"),
+## ("Daytona Road Course","467707118"),
 ## ("DirtFish Boneyard Course","980779751"),
 # ("DirtFish Mill Run Course","2600030656"),
 # ("DirtFish Pro Rallycross Course","2186625931"),
@@ -514,8 +520,9 @@ if __name__ == "__main__":
 # ("Hockenheim National","2317824311"),
 # ("Hockenheim Rallycross","761864750"),
 ## ("Hockenheim Short","1768660198"),
-## ("Indianapolis Motor Speedway Oval","62242453"),
-# ("Indianapolis Motor Speedway Road Course","211444010"),
+## ("Imola","920145926"),
+## ("Indianapolis Oval","62242453"),
+# ("Indianapolis Road Course","211444010"),
 ## ("Knockhill International","2168579513"),
 # ("Knockhill International Reverse","3206894082"),
 ## ("Knockhill National","1887425815"),
@@ -524,7 +531,7 @@ if __name__ == "__main__":
 # ("Knockhill Tri-Oval","3353861064"),
 # ("Le Mans Bugatti Circuit","3267032607"),
 # ("Le Mans International Karting Circuit","1457129528"),
-## ("Le Mans V Track","167552033"),
+## ("Le Mans Vintage Track","167552033"),
 # ("Long Beach Street Circuit","1731699995"),
 ## ("Lydden Hill GP","953639515"),
 # ("Lydden Hill Rallycross","673609283"),
@@ -541,6 +548,11 @@ if __name__ == "__main__":
 # ("Mojave Coyote Noose","369271528"),
 # ("Mojave Gila Crest","4234466862"),
 # ("Mojave Sidewinder","2015693491"),
+# ("Monza GP","4241994684"),
+# ("Monza GP Historic","1184596327"),
+# ("Monza Historic Oval + GP Mix","1327182267"),
+# ("Monza Oval Historic","4131920659"),
+# ("Monza Short","368740158"),
 ## ("Mugello GP","1730519219"), 
 # ("Nurburgring Combined","3403453048"),
 ## ("Nurburgring GP","3348999902"),
@@ -589,6 +601,8 @@ if __name__ == "__main__":
 ## ("Sonoma Raceway GP","2840687665"),
 ## ("Sonoma Raceway National","3299764567"),
 # ("Sonoma Raceway Short","1035110721"),
+## ("Spa-Francorchamps GP","904625875"),
+## ("Spa-Francorchamps Historic","2490004715"),
 ## ("Sportsland SUGO","3270746104"),
 # ("Summerton International","4250218976"),
 # ("Summerton National","1408845203"),
