@@ -497,9 +497,15 @@ namespace PcarsUDP
             byte[] str2 = binaryReader.ReadBytes(64);
             int lengthOfStr2 = Array.IndexOf(str2, (byte)0); // e.g. 4 for "clip\0"
             TrackVariation = System.Text.ASCIIEncoding.Default.GetString(str2, 0, lengthOfStr2);
-            //TranslatedTrackLocation = binaryReader.ReadChars(64);
-            //TranslatedTrackVariation = binaryReader.ReadChars(64);
-            //LapsTimeInEvent = binaryReader.ReadUInt16();
+
+            byte[] str3 = binaryReader.ReadBytes(64);
+            int lengthOfStr3 = Array.IndexOf(str3, (byte)0); // e.g. 4 for "clip\0"
+            TranslatedTrackLocation = System.Text.ASCIIEncoding.Default.GetString(str3, 0, lengthOfStr3);
+            byte[] str4 = binaryReader.ReadBytes(64);
+            int lengthOfStr4 = Array.IndexOf(str4, (byte)0); // e.g. 4 for "clip\0"
+            TranslatedTrackVariation = System.Text.ASCIIEncoding.Default.GetString(str4, 0, lengthOfStr4);
+            
+            LapsTimeInEvent = binaryReader.ReadUInt16();
             EnforcedPitStopLap = binaryReader.ReadSByte();
         }
 
@@ -1668,41 +1674,41 @@ namespace PcarsUDP
             }
         }
 
-        //public string TranslatedTrackLocation
-        //{
-        //    get
-        //    {
-        //        return _TranslatedTrackLocation;
-        //    }
-        //    set
-        //    {
-        //        _TranslatedTrackLocation = value;
-        //    }
-        //}
+        public string TranslatedTrackLocation
+        {
+            get
+            {
+                return _TranslatedTrackLocation;
+            }
+            set
+            {
+                _TranslatedTrackLocation = value;
+            }
+        }
 
-        //public string TranslatedTrackVariation
-        //{
-        //    get
-        //    {
-        //        return _TranslatedTrackVariation;
-        //    }
-        //    set
-        //    {
-        //        _TranslatedTrackVariation = value;
-        //    }
-        //}
+        public string TranslatedTrackVariation
+        {
+            get
+            {
+                return _TranslatedTrackVariation;
+            }
+            set
+            {
+                _TranslatedTrackVariation = value;
+            }
+        }
 
-        //public UInt16 LapsTimeInEvent
-        //{
-        //    get
-        //    {
-        //        return _LapsTimeInEvent;
-        //    }
-        //    set
-        //    {
-        //        _LapsTimeInEvent = value;
-        //    }
-        //}
+        public UInt16 LapsTimeInEvent
+        {
+            get
+            {
+                return _LapsTimeInEvent;
+            }
+            set
+            {
+                _LapsTimeInEvent = value;
+            }
+        }
 
         public sbyte EnforcedPitStopLap
         {

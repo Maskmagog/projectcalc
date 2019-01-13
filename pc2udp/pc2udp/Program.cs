@@ -1,4 +1,18 @@
-﻿using PcarsUDP;
+﻿//******************************************
+// Project CALC - by Martin Holmström
+// UDP library by Zach Etier (Zeratall)
+// Expanded by Martin Holmström (Maskmagog)
+// maskmagog@gmail.com
+// https://github.com/Maskmagog/projectcalc
+// 
+// Feel free to use the program(s) 
+// but don't make money on it.
+// Change/adapt/modify the code as you want
+// but keep these lines. Thank you.
+//******************************************
+
+
+using PcarsUDP;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -31,6 +45,9 @@ namespace pc2udp
         private static string TranslatedFullTrackLocation = "";
         private static string TranslatedTrackLocation = "";
         private static string TranslatedTrackVariation = "";
+        private static float TrackLength;
+        private static int TrackLengthInt;
+        private static string strTrackLengthInt;
         private static double LastLapTimeSec = 0;
         private static double LastSector1TimeSec = 0;
         private static double LastSector2TimeSec = 0;
@@ -40,6 +57,10 @@ namespace pc2udp
         private static double FastestSector3TimeSec = 0;
         private static Int16 TrackTemp;
         private static Int16 AmbTemp;
+        private static double PitModeSchedule;
+        private static string PitMode;
+        private static string CurrentLapOutLap = "N";
+        private static string CurrentLapInLap  = "N";
         private static double PreviousSector = 3;
         private static string SessionLapRecord = "N";
         private static double OldFastestLapTimeSec = 99999999;
@@ -63,6 +84,10 @@ namespace pc2udp
         public static double OldLapTimeSec = 0;
         public static int a = 0;
         public static int ValuesReset = 0;
+        public static string validlapsonly;
+        public static string timetrialonly;
+        public static string settings1;
+        public static string settings2;
 
 
         public static void resetValues()
@@ -81,6 +106,8 @@ namespace pc2udp
             AllTimeRecord = "N";
             LastLapValid = "Y";
             CurrentLapValid = "Y";
+            CurrentLapInLap = "N";
+            CurrentLapOutLap = "N";
         }
 
         //************************************
@@ -120,7 +147,7 @@ namespace pc2udp
                 command.Parameters.Add("?camera", MySqlDbType.VarChar, 8).Value = "In-car";
                 command.ExecuteNonQuery();
                 Console.WriteLine("----Session lap record? " + SessionLapRecord);
-                Console.WriteLine(Name + FullTrackLocation + VehicleName + LastLapTimeSec + LastLapValid);
+                Console.WriteLine(Name + "-" + FullTrackLocation + "-" + VehicleName + "-" + LastLapTimeSec + "-" + LastLapValid);
                 Console.WriteLine("***********NEW LAPTIME ADDED TO DATABASE***************");
                 Console.WriteLine("S1 = " + LastSector1TimeSec);
                 Console.WriteLine("S2 = " + LastSector2TimeSec);
@@ -169,6 +196,42 @@ namespace pc2udp
             conn.Close();
             Console.WriteLine("Done.");
         }
+
+        //************************************
+        // Getting settings from database
+        //************************************
+        public static void dbFetchSettings()
+        {
+            // DATABASE CONNECTION
+            string connStr = String.Format("server={0}; user={1}; database={2}; port={3}; password={4}", Server, User, Database, 3306, Pass);
+            MySqlConnection conn = new MySqlConnection(connStr);
+            try
+            {
+                Console.WriteLine("Connecting to MySQL...");
+                // Open connection to db
+                conn.Open();
+
+                // Perform database operations, TODO change to parameterized
+                string cmd = "SELECT timetrialonly, validlapsonly FROM settings";
+
+                MySqlCommand command = new MySqlCommand(cmd, conn);
+                MySqlDataReader dataReader = command.ExecuteReader();
+                while (dataReader.Read())
+                {
+                    validlapsonly = (dataReader["validlapsonly"].ToString());
+                    timetrialonly = (dataReader["timetrialonly"].ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("No previous record found.");
+            }
+
+            // Close connection to db
+            conn.Close();
+            Console.WriteLine("Done.");
+        }
+
         //************************************
         // Inserts your username into database
         //************************************
@@ -220,6 +283,7 @@ namespace pc2udp
                 Console.WriteLine("cmd " + cmd);
                 var command = new MySqlCommand(cmd, conn);
 
+                Console.WriteLine("Track Length " + TrackLength);
                 command.ExecuteNonQuery();
                 Console.WriteLine("******NEW CAR - TRACK ADDED TO DATABASE*******");
                 OldFullTrackLocation = FullTrackLocation;
@@ -256,35 +320,35 @@ namespace pc2udp
             //************
             while (true)
             {
-            //Thread.Sleep(20);
-            uDP.readPackets(); //Read Packets ever loop iteration
+                //Thread.Sleep(20);
+                uDP.readPackets(); //Read Packets ever loop iteration
 
 
-            /* Detect session restarts. trigger a function to reset values */
-            if (strRaceMode == "Not Started" & ValuesReset == 0) {
-                resetValues();
-                Console.WriteLine("Session restart/new session? Values reset.");
-                ValuesReset = 1;
-            } 
+                /* Detect session restarts. trigger a function to reset values */
+                if (strRaceMode == "Not Started" & ValuesReset == 0) {
+                    resetValues();
+                    Console.WriteLine("Session restart/new session? Values reset.");
+                    ValuesReset = 1;
+                } 
 
-            //****************************
-            //Track Location (if not null)
-            //****************************
-            if (uDP._TrackLocation != null)
-            {
-                TrackLocation = uDP.TrackLocation;
-                //Console.WriteLine("Track location is " + TrackLocation);
-                TrackLocation = TrackLocation.Replace("_", " ");
+                //****************************
+                //Track Location (if not null)
+                //****************************
+                if (uDP._TrackLocation != null)
+                {
+                    TrackLocation = uDP.TrackLocation;
+                    //Console.WriteLine("Track location is " + TrackLocation);
+                    TrackLocation = TrackLocation.Replace("_", " ");
 
-                //Track Variation
-                TrackVariation = uDP.TrackVariation;
-                //Console.WriteLine("Track variation is " + TrackVariation);
-                TrackVariation = TrackVariation.Replace("_", " ");
+                    //Track Variation
+                    TrackVariation = uDP.TrackVariation;
+                    //Console.WriteLine("Track variation is " + TrackVariation);
+                   TrackVariation = TrackVariation.Replace("_", " ");
 
-                // Concatenate tracklocation2 and trackvariation 
-                FullTrackLocation = TrackLocation + " " + TrackVariation;
-                //Console.WriteLine("FullTrackLocation is " + FullTrackLocation);
-            }
+                    // Concatenate tracklocation2 and trackvariation 
+                    FullTrackLocation = TrackLocation + " " + TrackVariation;
+                   //Console.WriteLine("FullTrackLocation is " + FullTrackLocation);
+                }
 
                 if (uDP._TranslatedTrackLocation != null)
                 {
@@ -302,6 +366,11 @@ namespace pc2udp
                     //Console.WriteLine("FullTrackLocation is " + FullTrackLocation);
                 }
 
+                //Track Length
+                TrackLength = uDP.TrackLength;
+                TrackLengthInt = (int)TrackLength; //Convert to integer
+               
+
                 //************************************************************
                 // Vehicle name and class id
                 //************************************************************
@@ -314,7 +383,7 @@ namespace pc2udp
                 int SubIndex = 2;
 
                 if (uDP.VehicleClass != 0 && uDP.VehicleName != null)
-               {
+                {
                     var list = new List<uint> { 3357278208, 151060480, 2156134400, 1158676480, 2585198592, 1859780608, 2841116672, 349979920}; //These classes only have 1 character ahead of name
                     var exists = list.Contains(uDP.VehicleClass);
             
@@ -341,7 +410,7 @@ namespace pc2udp
                 if (uDP.VehicleClass == 2041511936) { VehicleClass = "GT3"; }
                 if (uDP.VehicleClass == 3878354944) { VehicleClass = "GT4"; }
                 if (uDP.VehicleClass == 3007315968) { VehicleClass = "GT5";}
-                if (uDP.VehicleClass == 496107520) { VehicleClass = "G40 Junior"; }
+                if (uDP.VehicleClass == 496107520) { VehicleClass = "G40 Jr"; }
                 if (uDP.VehicleClass == 4259840) { VehicleClass = "GTE"; }
                 if (uDP.VehicleClass == 4252434432) { VehicleClass = "Group A"; }
                 if (uDP.VehicleClass == 572784640) { VehicleClass = "Group B"; }
@@ -406,37 +475,44 @@ namespace pc2udp
                 if (VehicleName == "Honda24Concept") { VehicleName = "Honda 2&4 Concept"; }
                 if (VehicleName == "Mercedes-AMG A 45 SMS-R Touring") { VehicleName = "Mercedes-AMG A 45 SMS-R Touring"; }
                 if (VehicleName == "Opel Astra TCR") { VehicleName = "Opel Astra TCR"; }
-                if (FullTrackLocation == "Algarve ") { FullTrackLocation = "Autodromo Internacional do Algarve"; } //Whitespace
-                if (FullTrackLocation == "Barcelona Catalunya GP") { FullTrackLocation = "Circuit de Barcelona-Catalunya GP"; }
-                if (FullTrackLocation == "Barcelona Catalunya National") { FullTrackLocation = "Circuit de Barcelona-Catalunya National"; }
-                if (FullTrackLocation == "Barcelona Catalunya Club") { FullTrackLocation = "Circuit de Barcelona-Catalunya Club"; }
+                if (VehicleName == "Ginetta G40 GT5") { VehicleClass = "GT5"; }
+
+                if (FullTrackLocation == "Algarve ") { FullTrackLocation = "Algarve"; } //Whitespace
+                if (FullTrackLocation == "Barcelona Catalunya GP") { FullTrackLocation = "Barcelona-Catalunya GP"; }
+                if (FullTrackLocation == "Barcelona Catalunya National") { FullTrackLocation = "Barcelona-Catalunya National"; }
+                if (FullTrackLocation == "Barcelona Catalunya Club") { FullTrackLocation = "Barcelona-Catalunya Club"; }
                 if (FullTrackLocation == "Brands Hatch Rallycross") { FullTrackLocation = "Brands Hatch Classic Rallycross"; }
-                if (FullTrackLocation == "DirtFish Stage1") { FullTrackLocation = "DirtFish Pro Rallycross Course"; } 
+                if (FullTrackLocation == "DirtFish Stage3")
+                    {
+                    if (TrackLengthInt == 1353) { FullTrackLocation = "DirtFish Mill Run Course"; }
+                    else { FullTrackLocation = "DirtFish Pro Rallycross Course"; }
+                    }
                 if (FullTrackLocation == "DirtFish Stage2") { FullTrackLocation = "DirtFish Boneyard Course"; }
-                if (FullTrackLocation == "DirtFish Stage3") { FullTrackLocation = "DirtFish Pro Rallycross Course"; } //Game bug: 'DirtFish Stage3' sent for both Pro Rallycross Course and Mill Run :(
                 if (FullTrackLocation == "SUGO GP") { FullTrackLocation = "Sportsland SUGO"; }
-                if (FullTrackLocation == "Spa Francorchamps GP") { FullTrackLocation = "Circuit de Spa-Francorchamps GP"; }
-                if (FullTrackLocation == "Spa Francorchamps Historic GP") { FullTrackLocation = "Circuit de Spa-Francorchamps Historic"; }
+                if (FullTrackLocation == "Spa Francorchamps GP") { FullTrackLocation = "Spa-Francorchamps GP"; }
+                if (FullTrackLocation == "Spa Francorchamps Historic GP") { FullTrackLocation = "Spa-Francorchamps Historic"; }
                 if (FullTrackLocation == "Laguna Seca ") { FullTrackLocation = "Mazda Raceway Laguna Seca"; } //Whitespace
                 if (FullTrackLocation == "Snetterton 100 Circuit") { FullTrackLocation = "Snetterton 100"; }
                 if (FullTrackLocation == "Snetterton 200 Circuit") { FullTrackLocation = "Snetterton 200"; }
                 if (FullTrackLocation == "Snetterton 300 Circuit") { FullTrackLocation = "Snetterton 300"; }
                 if (FullTrackLocation == "Rouen ") { FullTrackLocation = "Rouen Les Essarts"; } //Whitespace
                 if (FullTrackLocation == "Rouen Short") { FullTrackLocation = "Rouen Les Essarts Short"; }
-                if (FullTrackLocation == "Monza GP") { FullTrackLocation = "Autodromo Nazionale Monza GP"; }
-                if (FullTrackLocation == "Monza Short") { FullTrackLocation = "Autodromo Nazionale Monza Short"; }
-                if (FullTrackLocation == "Monza Classic GP") { FullTrackLocation = "Autodromo Nazionale Monza GP Historic"; }
-                if (FullTrackLocation == "Monza Classic Historic Oval") { FullTrackLocation = "Autodromo Nazionale Monza Oval Historic"; }
-                if (FullTrackLocation == "Monza Classic Historic Mix") { FullTrackLocation = "Autodromo Nazionale Monza Oval + GP Historic"; }
+                if (FullTrackLocation == "Monza Classic GP") { FullTrackLocation = "Monza GP Historic"; }
+                if (FullTrackLocation == "Monza Classic Historic Oval") { FullTrackLocation = "Monza Oval Historic"; }
+                if (FullTrackLocation == "Monza Classic Historic Mix") { FullTrackLocation = "Monza Oval + GP Historic"; }
                 if (FullTrackLocation == "Hell Rallycross") { FullTrackLocation = "Lankebanen Rallycross"; }
-                if (FullTrackLocation == "Imola GP") { FullTrackLocation = "Autodromo Internazionale Enzo E Dino Ferrari Imola"; }
                 if (FullTrackLocation == "Le Mans Le Mans Bugatti Circuit") { FullTrackLocation = "Le Mans Bugatti Circuit"; }
                 if (FullTrackLocation == "Le Mans Kart Int Le Mans International Karting Circuit") { FullTrackLocation = "Le Mans International Karting Circuit"; }
                 if (FullTrackLocation == "Lydden Hill Circuit") { FullTrackLocation = "Lydden Hill GP"; }
+                if (FullTrackLocation == "Le Mans Vintage Le Mans Vintage Track") { FullTrackLocation = "Le Mans Vintage Track"; }
+                if (FullTrackLocation == "Hockenheim Short")
+                {
+                    if (TrackLengthInt == 2593) { FullTrackLocation = "Hockenheim Short"; }
+                    else { FullTrackLocation = "Hockenheim Rallycross"; }
+                }
 
-
-                // Bug: Hockenheim Rallycross is sent as Hockenheim Short :( (Translated name: Hockenheimring Short)
-                // Bug: 'DirtFish Stage3' sent for both Pro Rallycross Course and Mill Run :(
+                // Bug: Both Hockenheim Short and Hockenheim Rallycross is sent as 'Hockenheim Short'  (Translated name: Hockenheimring Short)
+                // Bug: 'DirtFish Stage3' sent for both 'DirtFish Pro Rallycross Course' and 'DirtFish Mill Run Course'
 
 
                 // Get names for certain cars
@@ -462,6 +538,7 @@ namespace pc2udp
                     Console.WriteLine("Current class is " + VehicleClass);
                     Console.WriteLine("VehicleClass is " + uDP.VehicleClass);
                     Console.WriteLine("Translated track full name is " + TranslatedFullTrackLocation);
+                    Console.WriteLine("Track length is " + TrackLength);
                     dbCurrentCarTrack();
                 }
 
@@ -554,7 +631,29 @@ namespace pc2udp
                     { strSessionMode = "Time Trial"; }
                     //Console.WriteLine("strSessionMode = " + strSessionMode);
 
-                // TODO Use GameState to catch restarts and reset values
+                // TODO Use GameState to catch restarts and reset values?
+                }
+
+
+                //********************
+                // Pit Mode Schedule *
+                //********************
+                PitModeSchedule = (uDP.ParticipantInfo[uDP.ViewedParticipantIndex, 10]);
+
+                if (PitModeSchedule == 0) { PitMode = "NONE"; }
+                if (PitModeSchedule == 1) { PitMode = "DRIVING_INTO_PITS"; }
+                if (PitModeSchedule == 2) { PitMode = "IN_PIT"; }
+                if (PitModeSchedule == 3) { PitMode = "DRIVING_OUT_OF_PITS"; }
+                if (PitModeSchedule == 4) { PitMode = "IN_GARAGE"; }
+                if (PitModeSchedule == 5) { PitMode = "DRIVING_OUT_OF_GARAGE"; }
+             
+                if (PitMode == "DRIVING_OUT_OF_GARAGE" || PitMode == "DRIVING_OUT_OF_PITS")
+                {
+                    CurrentLapOutLap = "Y";
+                }
+                if (PitMode == "DRIVING_INTO_PITS")
+                {
+                    CurrentLapInLap = "Y";
                 }
 
                 // Track Temperature
@@ -576,8 +675,9 @@ namespace pc2udp
                     FastestSector2TimeSec = (uDP.ParticipantStatsInfo[uDP.ViewedParticipantIndex, 6]);
                     FastestSector3TimeSec = (uDP.ParticipantStatsInfo[uDP.ViewedParticipantIndex, 7]);
 
+                    
                     // Write current and previous sector to console
-                   // Console.WriteLine("Current Sector is " + CurrentSector + " and Previous Sector was " + PreviousSector + "==========================");
+                    // Console.WriteLine("Current Sector is " + CurrentSector + " and Previous Sector was " + PreviousSector + "==========================");
 
                     //***************************************************************************
                     // Loop everything a few times to allow for correct sector times to be sent *
@@ -586,6 +686,11 @@ namespace pc2udp
                     //Console.WriteLine("a = " + a);
                     if (a > 5)
                     {
+                        // Temp print of pit mode for test
+                        //Console.WriteLine("PitMode " + PitMode);
+                        //Console.WriteLine("In lap? " + CurrentLapInLap);
+                        //Console.WriteLine("Out lap? " + CurrentLapOutLap);
+
                         // Set last sectortime to the previous sector time 
                         if (CurrentSector == 2)
                         {
@@ -608,6 +713,9 @@ namespace pc2udp
                             Console.WriteLine("Sector 3 time is " + LastSector3TimeSec);
                             a = 0;
                             PreviousSector = CurrentSector;
+
+                            // Temp print TrackLength
+                            Console.WriteLine("Track lenght is " + TrackLength);
 
                             // Current sector=1 means previous sector=3 means New lap: check invalid lap variable
                             if (CurrentLapValid == "N")
@@ -637,6 +745,8 @@ namespace pc2udp
                         else
                         { SessionLapRecord = "N"; }
 
+                        
+                        
                         // Check if it's a new lap that should be sent to db
                         if (LastLapTimeSec > 0 && OldLapTimeSec != LastLapTimeSec && CurrSessionState != 4)  //TT only. excluding formation laps (untested). Should check for in/out laps too.
                         {
@@ -652,11 +762,54 @@ namespace pc2udp
                                 else { Console.WriteLine("New lap record, but unfortunately invalid lap"); }
                             }
                             else { AllTimeRecord = "N"; }
-                            if (LastLapValid == "Y") // Only send valid laps to db
+
+                            // Check user settings to see what laps is ok to send
+                            dbFetchSettings();
+                            Console.WriteLine("Timetrialonly: " + timetrialonly + " and validlapsonly: " + validlapsonly);
+
+                            if (validlapsonly == "Y" && timetrialonly == "Y") // Check user settings (settings.php, table 'settings')
                             {
-                                dbSendLapToDb(); // Send the lap to MariaDB
+                                if (LastLapValid == "Y" && strSessionMode == "Time Trial") // Only send valid laps in TT to db
+                                {
+                                    dbSendLapToDb(); // Send the lap to MariaDB
+                                    Console.WriteLine("TT and valid");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Lap not stored. Settings are: Only valid laps, and only laps in TT");
+                                }                                        
                             }
-                            CurrentLapValid = "Y"; // Reset CurrentLapValid
+                            if (validlapsonly == "N" && timetrialonly == "Y") // Check user settings (settings.php, table 'settings')
+                            {
+                                if (strSessionMode == "Time Trial") // Only send laps in TT to db, valid or invalid
+                                {
+                                    dbSendLapToDb(); // Send the lap to MariaDB
+                                    Console.WriteLine("TT");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Lap not stored. Settings are: Only laps in TT");
+                                }
+                            }
+                            if (validlapsonly == "Y" && timetrialonly == "N") // Check user settings (settings.php, table 'settings')
+                            {
+                                if (LastLapValid == "Y") // Only send valid laps to db in any game mode
+                                {
+                                    dbSendLapToDb(); // Send the lap to MariaDB
+                                    Console.WriteLine("Valid");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Lap not stored. Settings are: Only valid laps");
+                                }
+                            }
+                            if (validlapsonly == "N" && timetrialonly == "N") // Check user settings (settings.php, table 'settings')
+                            {
+                                dbSendLapToDb(); Console.WriteLine("All laps");  // if validlapsonly = "N" and timetrialonly = N then send all laps to db
+                            }
+                                CurrentLapValid = "Y"; // Reset CurrentLapValid
+                            CurrentLapInLap = "N"; // Reset
+                            CurrentLapOutLap = "N"; // Reset
                             OldLapTimeSec = LastLapTimeSec; // Store the last lap time in variable for later comparisons
                         }
 
