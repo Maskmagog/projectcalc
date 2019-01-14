@@ -52,14 +52,15 @@ $result = $stmt->get_result();
 $row = $result->fetch_assoc();
 
 echo "These settings control what laps will be stored in the database. It will not affect laptimes already stored. It will not affect the laptimes fetched from cars2-stats-steam.wmdportal.com<br>";
-// Radio buttons
-echo "<div class='settings'><form name='settings' action='settings.php' method='POST'>";
+// Radio buttons for TT and valid laps
+echo "<div class='settings'><form name='ttsettings' action='settings.php' method='POST'>";
 echo "<br>Time trial only ?<br><input type='radio' name='timetrialonly' "; if($row['timetrialonly']=="Y") { echo "checked"; } echo " value='Y'>YES<br><input type='radio' name='timetrialonly'"; if($row['timetrialonly']=="N") { echo "checked"; } echo " value='N'>NO";
 echo "<br>Valid laps only?<br><input type='radio' name='validlapsonly' "; if($row['validlapsonly']=="Y") { echo "checked"; } echo " value='Y'>YES<br><input type='radio' name='validlapsonly'"; if($row['validlapsonly']=="N") { echo "checked"; } echo " value='N'>NO";
-echo "<br><input type='submit' name='submit' value='Submit'>";
-
+echo "<br><input type='submit' name='ttsubmit' value='Submit'>";
+//End form
+echo "</form>";
 // Send to MariaDB
-if (isset($_POST['submit'])) {
+if (isset($_POST['ttsubmit'])) {
 $sql = ("UPDATE settings SET timetrialonly='{$_POST['timetrialonly']}', validlapsonly='{$_POST['validlapsonly']}' WHERE id=1");
 if(mysqli_query($mysqli, $sql)){
     echo "<br><br>Records were updated successfully.";
@@ -68,9 +69,49 @@ if(mysqli_query($mysqli, $sql)){
     echo "<br><br>ERROR: Could not update database";
 }
 }
+echo "<br><br>-----------------------------------------<br>";
 
+// Controller and platform
+echo "<div class='settings'><form name='gamesettings' action='settings.php' method='POST'>";
+echo "<br>Here you can set your platform and controller type.<br>You can also set your normal setup: Default, Custom or Mixed depending on your habits.<br>";
+
+echo "<select id='platformselect' name='platformselect' class='dropdown' style='width: 90px'>";
+if ($row['platform'] == 'XB1') {$selected = " selected='selected' ";} else { $selected ="";}
+echo "<option value='XB1' . $selected>XB1</option>";
+if ($row['platform'] == 'PS4') {$selected = " selected='selected' ";}  else { $selected ="";}
+echo "<option value='PS4' . $selected>PS4</option>";
+if ($row['platform'] == 'PC') {$selected = " selected='selected' ";}  else { $selected ="";}
+echo "<option value='PC' . $selected>PC</option></select><br>";
+
+echo "<select id='controllerselect' name='controllerselect' class='dropdown' style='width: 90px'>";
+if ($row['controller'] == 'W') {$selected = " selected='selected' ";} else { $selected ="";}
+echo "<option value='W' . $selected>Wheel</option>";
+if ($row['controller'] == 'G') {$selected = " selected='selected' ";} else { $selected ="";}
+echo "<option value='G' . $selected>Gamepad</option>";
+if ($row['controller'] == 'K') {$selected = " selected='selected' ";} else { $selected ="";}
+echo "<option value='K' . $selected>Keyboard</option></select><br>";
+
+echo "<select id='setupselect' name='setupselect' class='dropdown' style='width: 90px'>";
+if ($row['setup'] == 'D') {$selected = " selected='selected' ";} else { $selected ="";}
+echo "<option value='D' . $selected>Default</option>";
+if ($row['setup'] == 'C') {$selected = " selected='selected' ";} else { $selected ="";}
+echo "<option value='C' . $selected>Custom</option>";
+if ($row['setup'] == '?') {$selected = " selected='selected' ";} else { $selected ="";}
+echo "<option value='M' . $selected>Mixed</option></select><br>";
+// Submit nutton for game settings
+echo "<br><input type='submit' name='gamesubmit' value='Submit'>";
 //End form
 echo "</form>";
+// Send to MariaDB
+if (isset($_POST['gamesubmit'])) {
+$sql = ("UPDATE settings SET platform='{$_POST['platformselect']}', controller='{$_POST['controllerselect']}', setup='{$_POST['setupselect']}' WHERE id=1");
+if(mysqli_query($mysqli, $sql)){
+    echo "<br><br>Records were updated successfully.";
+	echo "<meta http-equiv='refresh' content='0'>";
+} else {
+    echo "<br><br>ERROR: Could not update database";
+}
+}
 
 // Return to leaderboard link
 echo "<br><br><a href='index.php?trackselect={$_SESSION['trackselect']}&carselect={$_SESSION['carselect']}&classelect={$_SESSION['classelect']}&lbselect=AllTopTimes'><button>Back to leaderboard</button></a><br><br>";
