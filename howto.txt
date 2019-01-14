@@ -42,6 +42,9 @@ you maybe need to add your gamertag manually the first time
 insert into user(id, username) VALUES(1,'yourgamertag')
 (this can certainly be done from the pc2udp script, checking if it's empty first, not sure how it works right now)
 
+add one more table
+create table settings(id INT, platform VARCHAR(3), controller VARCHAR(1), setup VARCHAR(1), timetrialonly VARCHAR(1), validlapsonly VARCHAR(1));
+
 ****** PC2UDP *********
 visual studio
 open project pc2udp
