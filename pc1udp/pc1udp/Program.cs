@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using System.Runtime.InteropServices;
 using System.Data.SqlClient;
+using System.Text;
 
 namespace pc1udp
 {
@@ -44,13 +45,13 @@ namespace pc1udp
         public static float TrackLength;
         public static int TrackLengthInt;
         public static string strTrackLengthInt;
-        private static double LastLapTimeSec = 0;
-        private static double LastSector1TimeSec = 0;
-        private static double LastSector2TimeSec = 0;
-        private static double LastSector3TimeSec = 0;
-        private static double FastestSector1TimeSec = 0;
-        private static double FastestSector2TimeSec = 0;
-        private static double FastestSector3TimeSec = 0;
+        private static double LastLapTime = 0;
+        private static double LastSector1Time = 0;
+        private static double LastSector2Time = 0;
+        private static double LastSector3Time = 0;
+        private static double FastestSector1Time = 0;
+        private static double FastestSector2Time = 0;
+        private static double FastestSector3Time = 0;
         private static Int16 TrackTemp;
         private static Int16 AmbTemp;
         public static int PitSchedule;
@@ -63,8 +64,8 @@ namespace pc1udp
         private static string CurrentLapInLap = "N";
         private static double PreviousSector = 3;
         private static string SessionLapRecord = "N";
-        private static double OldFastestLapTimeSec = 99999999;
-        private static double FastestLapTimeSec = 0;
+        private static double OldFastestLapTime = 99999999;
+        private static double FastestLapTime = 0;
         private static double dbLapRecord = 0;
         private static string AllTimeRecord = "N";
         public static string VehicleName;
@@ -93,31 +94,77 @@ namespace pc1udp
         public static string SessionState;
         public static string RaceState;
         public static int LapInvalidated;
-        public double Speedkmh;
-        public double SpeedkmhAverage;
+        public static int test;
 
         public static void ResetValues()
         {
-            LastLapTimeSec = 0;
-            LastSector1TimeSec = 0;
-            LastSector2TimeSec = 0;
-            LastSector3TimeSec = 0;
-            FastestSector1TimeSec = 0;
-            FastestSector2TimeSec = 0;
-            FastestSector3TimeSec = 0;
+            LastLapTime = 0;
+            LastSector1Time = 0;
+            LastSector2Time = 0;
+            LastSector3Time = 0;
+            FastestSector1Time = 0;
+            FastestSector2Time = 0;
+            FastestSector3Time = 0;
             PreviousSector = 3;
-            OldFastestLapTimeSec = 99999999;
+            OldFastestLapTime = 99999999;
             dbLapRecord = 0;
             SessionLapRecord = "N";
             AllTimeRecord = "N";
             LastLapValid = "Y";
-            CurrentLapValid = "Y"; 
+            CurrentLapValid = "Y";
             CurrentLapInLap = "N";
             CurrentLapOutLap = "N";
             PitMode = 0;
             PitSchedule = 0;
         }
 
+
+
+        //************************************
+        // Sending laps to Azure
+        //************************************
+        static void SendLapToAzure()
+        {
+
+            Console.WriteLine("Connecting to Azure...");
+            string connectionString = "Server = tcp:projectcalc.database.windows.net,1433; Initial Catalog = projectcalc; User ID = pcalcadmin; Password = A6pPTgmz5#gBkKK*310sonHq;";
+
+            string commandText = "INSERT INTO laptimes(laptime, vehicle, track, gamertag, vehicleclass, sector1, sector2, sector3, sessionmode, platform, controller, setup, lapdate) VALUES(@laptime,@vehicle, @track, @gamertag,@vehicleclass,@sector1,@sector2,@sector3,@sessionmode,@platform,@controller,@setup,@lapdate)";
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand(commandText, connection);
+                command.Parameters.AddWithValue("@laptime", LastLapTime);
+                command.Parameters.AddWithValue("@vehicle", VehicleName);
+                command.Parameters.AddWithValue("@track", FullTrackLocation);
+                command.Parameters.AddWithValue("@gamertag", Name);
+                command.Parameters.AddWithValue("@vehicleclass", VehicleClass);
+                command.Parameters.AddWithValue("@sector1", LastSector1Time);
+                command.Parameters.AddWithValue("@sector2", LastSector2Time);
+                command.Parameters.AddWithValue("@sector3", LastSector3Time);
+                command.Parameters.AddWithValue("@sessionmode", SessionState);
+                command.Parameters.AddWithValue("@platform", platform);
+                command.Parameters.AddWithValue("@controller", controller);
+                command.Parameters.AddWithValue("@setup", setup);
+                command.Parameters.AddWithValue("@lapdate", DateTime.Now);
+                Console.WriteLine(Name + "-" + FullTrackLocation + "-" + VehicleName + "-" + LastLapTime + "-" + LastLapValid);
+                Console.WriteLine("***********NEW LAPTIME ADDED TO DATABASE***************");
+                Console.WriteLine("S1 = " + LastSector1Time);
+                Console.WriteLine("S2 = " + LastSector2Time);
+                Console.WriteLine("S3 = " + LastSector3Time);
+                try
+                {
+                    connection.Open();
+                    Int32 rowsAffected = command.ExecuteNonQuery();
+                    Console.WriteLine("RowsAffected: {0}", rowsAffected);
+                    Console.WriteLine("Done.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+        }
         //************************************
         // Inserts new laptimes into database
         //************************************
@@ -125,6 +172,7 @@ namespace pc1udp
         {
             // DATABASE CONNECTION
             string connStr = String.Format("server={0}; user={1}; database={2}; port={3}; password={4}", Server, User, Database, 3306, Pass);
+
             MySqlConnection conn = new MySqlConnection(connStr);
             try
             {
@@ -139,10 +187,10 @@ namespace pc1udp
                 command.Parameters.Add("?track", MySqlDbType.VarChar, 64).Value = FullTrackLocation;
                 command.Parameters.Add("?vehicle", MySqlDbType.VarChar, 64).Value = VehicleName;
                 command.Parameters.Add("?vehicleclass", MySqlDbType.VarChar, 64).Value = VehicleClass;
-                command.Parameters.Add("?laptime", MySqlDbType.Double).Value = LastLapTimeSec;
-                command.Parameters.Add("?sector1", MySqlDbType.Double).Value = LastSector1TimeSec;
-                command.Parameters.Add("?sector2", MySqlDbType.Double).Value = LastSector2TimeSec;
-                command.Parameters.Add("?sector3", MySqlDbType.Double).Value = LastSector3TimeSec;
+                command.Parameters.Add("?laptime", MySqlDbType.Double).Value = LastLapTime;
+                command.Parameters.Add("?sector1", MySqlDbType.Double).Value = LastSector1Time;
+                command.Parameters.Add("?sector2", MySqlDbType.Double).Value = LastSector2Time;
+                command.Parameters.Add("?sector3", MySqlDbType.Double).Value = LastSector3Time;
                 command.Parameters.Add("?tracktemp", MySqlDbType.Int16).Value = TrackTemp;
                 command.Parameters.Add("?ambtemp", MySqlDbType.Int16).Value = AmbTemp;
                 command.Parameters.Add("?raindensity", MySqlDbType.Double).Value = RainDensity;
@@ -155,11 +203,11 @@ namespace pc1udp
                 command.Parameters.Add("?camera", MySqlDbType.VarChar, 8).Value = "In-car";
                 command.ExecuteNonQuery();
                 Console.WriteLine("----Session lap record? " + SessionLapRecord);
-                Console.WriteLine(Name + "-" + FullTrackLocation + "-" + VehicleName + "-" + LastLapTimeSec + "-" + LastLapValid);
+                Console.WriteLine(Name + "-" + FullTrackLocation + "-" + VehicleName + "-" + LastLapTime + "-" + LastLapValid);
                 Console.WriteLine("***********NEW LAPTIME ADDED TO DATABASE***************");
-                Console.WriteLine("S1 = " + LastSector1TimeSec);
-                Console.WriteLine("S2 = " + LastSector2TimeSec);
-                Console.WriteLine("S3 = " + LastSector3TimeSec);
+                Console.WriteLine("S1 = " + LastSector1Time);
+                Console.WriteLine("S2 = " + LastSector2Time);
+                Console.WriteLine("S3 = " + LastSector3Time);
             }
             catch (Exception ex)
             {
@@ -332,14 +380,15 @@ namespace pc1udp
                 uDP.readPackets(); //Read Packets ever loop iteration
 
                 /* Detect session restarts. trigger a function to reset values */
-                
+
                 if (RaceState == "RACESTATE_NOT_STARTED" && ValuesReset == 0)
                 {
                     ResetValues();
                     Console.WriteLine("Session restart/new session? Values reset.");
                     ValuesReset = 1;
                 }
-            
+
+
                 //****************************
                 //Track Location (if not null)
                 //****************************
@@ -376,10 +425,15 @@ namespace pc1udp
 
                 //Console.WriteLine("VehicleName is " + VehicleName);    
                 //Console.WriteLine("VehicleClass is " + VehicleClass);
-                
+
                 // Vehicle class
                 if (VehicleClass == "G40 Junior") { VehicleClass = "G40 Jr"; }
-                if (VehicleClass == "Group C1") { VehicleClass = "Group C"; }
+                if (VehicleClass == "Group C1") { VehicleClass = "Gr. C"; }
+                if (VehicleClass == "Group 4") { VehicleClass = "Gr. 4"; }
+                if (VehicleClass == "Group 5") { VehicleClass = "Gr. 5"; }
+                if (VehicleClass == "Group 6") { VehicleClass = "Gr. 6"; }
+                if (VehicleClass == "Group A") { VehicleClass = "Gr. A"; }
+                if (VehicleClass == "Group B") { VehicleClass = "Gr. B"; }
                 if (VehicleClass == "Touring Car") { VehicleClass = "TC"; }
                 if (VehicleClass == "Vintage Prototype A") { VehicleClass = "VP A"; }
                 if (VehicleClass == "Vintage Prototype B") { VehicleClass = "VP B"; }
@@ -388,10 +442,10 @@ namespace pc1udp
                 if (VehicleClass == "Vintage Touring-GT B") { VehicleClass = "VGT B"; }
                 if (VehicleClass == "Vintage Touring-GT C") { VehicleClass = "VGT C"; }
                 if (VehicleClass == "Vintage Touring-GT D") { VehicleClass = "VGT D"; }
-                if (VehicleClass == "Track Day A") { VehicleClass = "Trackday A"; }
-                if (VehicleClass == "Track Day B") { VehicleClass = "Trackday B"; }
+                if (VehicleClass == "Track Day A") { VehicleClass = "Track A"; }
+                if (VehicleClass == "Track Day B") { VehicleClass = "Track B"; }
                 if (VehicleClass == "Ferrari Series") { VehicleClass = "Ferrari"; }
-                if (VehicleClass == "Ferrari F355 Series") { VehicleClass = "F355 Series"; }
+                if (VehicleClass == "Ferrari F355 Series") { VehicleClass = "F355"; }
                 if (VehicleClass == "Formula Rookie") { VehicleClass = "F5"; }
                 if (VehicleClass == "Formula C") { VehicleClass = "FC"; }
                 if (VehicleClass == "Formula Renault") { VehicleClass = "FR35"; }
@@ -402,7 +456,7 @@ namespace pc1udp
                 if (VehicleClass == "Vintage F1 B") { VehicleClass = "V F1B"; }
                 if (VehicleClass == "Vintage F1 C") { VehicleClass = "V F1C"; }
                 if (VehicleClass == "Vintage F1 D") { VehicleClass = "V F1D"; }
-                if (VehicleClass == "Vintage F3 A") { VehicleClass = "V F3 A"; }
+                if (VehicleClass == "Vintage F3 A") { VehicleClass = "V F3A"; }
                 if (VehicleClass == "Vintage Indycar") { VehicleClass = "V Indy"; }
                 if (VehicleClass == "Kart1") { VehicleClass = "Kart"; }
                 if (VehicleClass == "Megane Trophy") { VehicleClass = "Mégane Trophy"; }
@@ -421,7 +475,7 @@ namespace pc1udp
                     test = "Camaro Z/28";
                     if (VehicleName.Contains(test)) { VehicleName = "Chevrolet Camaro Z/28 69 TransAm"; }
                     if (VehicleName == "Mercedes-Benz 300 SL (W194)") { VehicleName = "Mercedes-Benz 300 SL"; }
-                    if (VehicleName == "LamborghiniHuracanLP6104") { VehicleName = "Lamborghini Huracán LP610-4"; }
+                    if (VehicleName == "LamborghiniHuracanLP6104") { VehicleName = "Lamborghini Huracán LP610-4"; }
                     if (VehicleName == "BMW1SeriesMCoupeStanceWorksEdition") { VehicleName = "BMW 1 Series M Coupe StanceWorks Edition"; }
                     if (VehicleName == "Honda24Concept") { VehicleName = "Honda 2&4 Concept"; }
                     if (VehicleName == "Mercedes-AMG A 45 SMS-R Touring") { VehicleName = "Mercedes-AMG A 45 SMS-R Touring"; }
@@ -430,7 +484,7 @@ namespace pc1udp
                     if (VehicleName == "McLarenP1") { VehicleName = "McLaren P1"; }
                     if (VehicleName == "Ginetta G40 GT5") { VehicleClass = "GT5"; }
                 }
-                
+
                 if (FullTrackLocation == "Algarve ") { FullTrackLocation = "Algarve"; } //Whitespace 
 
                 if (FullTrackLocation == "Barcelona Catalunya GP") { FullTrackLocation = "Barcelona-Catalunya GP"; }
@@ -441,7 +495,7 @@ namespace pc1udp
                 if (FullTrackLocation == "Circuit of the Americas Club Circuit") { FullTrackLocation = "Circuit of the Americas Club"; }
                 if (FullTrackLocation == "Daytona International Speedway Road Course") { FullTrackLocation = "Daytona Road Course"; }
                 if (FullTrackLocation == "Daytona International Speedway Tri Oval") { FullTrackLocation = "Daytona Speedway Tri-Oval"; }
-
+                if (FullTrackLocation == "Daytona International Speedway Rallycross") { FullTrackLocation = "Daytona Rallycross"; }
                 if (FullTrackLocation == "DirtFish Stage 3")
                 {
                     if (TrackLengthInt == 1353) { FullTrackLocation = "DirtFish Mill Run Course"; }
@@ -509,109 +563,109 @@ namespace pc1udp
                     dbUsername();
                 }
 
-                
-                
-                
+
+
+
                 // GameState
                 OldGameState = GameState;
-                    switch (uDP.GameSessionState & 7)
-                    {
-                        case 0:
-                            //Console.WriteLine("Case 0: GameState = GAME_EXITED");
-                            GameState = "GAME_EXITED";
-                            break;
-                        case 1:
-                            //Console.WriteLine("Case 1: GameState = GAME_FRONT_END");
-                            GameState = "GAME_FRONT_END";
-                            break;
-                        case 2:
-                            //Console.WriteLine("Case 1: GameState = GAME_INGAME_PLAYING");
-                            GameState = "GAME_INGAME_PLAYING";
-                            break;
-                        case 3:
-                            //Console.WriteLine("Case 1: GameState = GAME_INGAME_PAUSED");
-                            GameState = "GAME_INGAME_PAUSED";
-                            break;
-                    }
-                
+                switch (uDP.GameSessionState & 7)
+                {
+                    case 0:
+                        //Console.WriteLine("Case 0: GameState = GAME_EXITED");
+                        GameState = "GAME_EXITED";
+                        break;
+                    case 1:
+                        //Console.WriteLine("Case 1: GameState = GAME_FRONT_END");
+                        GameState = "GAME_FRONT_END";
+                        break;
+                    case 2:
+                        //Console.WriteLine("Case 1: GameState = GAME_INGAME_PLAYING");
+                        GameState = "GAME_INGAME_PLAYING";
+                        break;
+                    case 3:
+                        //Console.WriteLine("Case 1: GameState = GAME_INGAME_PAUSED");
+                        GameState = "GAME_INGAME_PAUSED";
+                        break;
+                }
+
                 if (GameState != OldGameState)
                 {
-                    Console.Write("GameState now " + GameState);
+                    Console.WriteLine("GameState now " + GameState);
                     OldGameState = GameState;
                 }
                 // SessionState
-                
-                    OldSessionState = SessionState;
-                    switch (uDP.GameSessionState >> 4)
-                    {
-                        case 0:
-                            SessionState = "SESSION_INVALID";
-                            break;
-                        case 1:
-                            SessionState = "Practice";
-                            break;
-                        case 2:
-                            SessionState = "Test";
-                            break;
-                        case 3:
-                            SessionState = "Qualify";
-                            break;
-                        case 4:
-                            SessionState = "Formation Lap";
-                            break;
-                        case 5:
-                            SessionState = "Race";
-                            break;
-                        case 6:
-                            SessionState = "Time Trial";
-                            break;                    
+
+                OldSessionState = SessionState;
+                switch (uDP.GameSessionState >> 4)
+                {
+                    case 0:
+                        SessionState = "SESSION_INVALID";
+                        break;
+                    case 1:
+                        SessionState = "Practice";
+                        break;
+                    case 2:
+                        SessionState = "Test";
+                        break;
+                    case 3:
+                        SessionState = "Qualify";
+                        break;
+                    case 4:
+                        SessionState = "Formation Lap";
+                        break;
+                    case 5:
+                        SessionState = "Race";
+                        break;
+                    case 6:
+                        SessionState = "Time Trial";
+                        break;
                 }
 
                 if (SessionState != OldSessionState)
                 {
-                    Console.Write("SessionState now " + SessionState);
+                    Console.WriteLine("SessionState now " + SessionState);
                     OldSessionState = SessionState;
                 }
 
                 //RaceState
                 OldRaceState = RaceState;
-                
-                    switch (uDP.RaceStateFlags & 7)
-                    {
-                        case 0:
-                            RaceState = "RACESTATE_INVALID";
-                            break;
-                        case 1:
-                            RaceState = "RACESTATE_NOT_STARTED";
-                            break;
-                        case 2:
-                            RaceState = "RACESTATE_RACING";
-                            break;
-                        case 3:
-                            RaceState = "RACESTATE_FINISHED";
-                            break;
-                        case 4:
-                            RaceState = "RACESTATE_DISQUALIFIED";
-                            break;
-                        case 5:
-                            RaceState = "RACESTATE_RETIRED";
-                            break;
-                        case 6:
-                            RaceState = "RACESTATE_DNF";
-                            break;                    
+
+                switch (uDP.RaceStateFlags & 7)
+                {
+                    case 0:
+                        RaceState = "RACESTATE_INVALID";
+                        break;
+                    case 1:
+                        RaceState = "RACESTATE_NOT_STARTED";
+                        break;
+                    case 2:
+                        RaceState = "RACESTATE_RACING";
+                        break;
+                    case 3:
+                        RaceState = "RACESTATE_FINISHED";
+                        break;
+                    case 4:
+                        RaceState = "RACESTATE_DISQUALIFIED";
+                        break;
+                    case 5:
+                        RaceState = "RACESTATE_RETIRED";
+                        break;
+                    case 6:
+                        RaceState = "RACESTATE_DNF";
+                        break;
                 }
 
                 if (RaceState != OldRaceState)
                 {
-                    Console.Write("RaceState now " + RaceState);
+                    Console.WriteLine("RaceState now " + RaceState);
                     OldRaceState = RaceState;
                 }
 
                 //********************
                 // Pit Schedule *
                 //********************                
-                OldPitSchedule = PitSchedule;               
-                PitSchedule = (uDP.PitModeSchedule >> 3 & 3);                
+                OldPitSchedule = PitSchedule;
+                PitSchedule = (uDP.PitModeSchedule >> 3 & 3);
 
                 if (PitSchedule == 0) { strPitSchedule = "NONE"; }
                 if (PitSchedule == 1) { strPitSchedule = "STANDARD"; }
@@ -625,8 +679,8 @@ namespace pc1udp
                 }
 
                 // Pit Mode
-                OldPitMode = PitMode;               
-                PitMode = uDP.PitModeSchedule & 7;              
+                OldPitMode = PitMode;
+                PitMode = uDP.PitModeSchedule & 7;
 
                 if (PitMode == 0) { strPitMode = "NONE"; }
                 if (PitMode == 1) { strPitMode = "DRIVING_INTO_PITS"; }
@@ -653,14 +707,16 @@ namespace pc1udp
                 if (uDP.ParticipantInfo[0, 7] > 0)
                 {
                     CurrentSector = uDP.ParticipantInfo[0, 7];
-                }    
+                }
 
                 //***************************************
                 // Try to see if current lap is invalid *
                 //***************************************
                 LapInvalidated = uDP.RaceStateFlags >> 3 & 1;
-               
+                //Console.WriteLine("LapInvalidated = " + LapInvalidated);
+                //Console.WriteLine("CurrentLapValid = " + CurrentLapValid);
                 if (LapInvalidated == 1 && CurrentLapValid == "Y")
+                    
                 {
                     CurrentLapValid = "N";
                     Console.WriteLine("Lap invalidated, oops.");
@@ -668,36 +724,37 @@ namespace pc1udp
                 //******************************
                 // Check if sector has changed *
                 //******************************
-                if (PreviousSector != CurrentSector && RaceState == "RACESTATE_RACING")                
-                {    
+                //if (PreviousSector != CurrentSector && RaceState == "RACESTATE_RACING")     
+                if (PreviousSector != CurrentSector)
+                {
                     //***************************************************************************
                     // Loop everything a few times to allow for correct sector times to be sent *
                     //***************************************************************************
                     a++;
                     if (a > 5) // Continue when a > 5
-                    {                       
+                    {
                         // Set last sectortime to the previous sector time 
                         if (CurrentSector == 2)
                         {
-                            LastSector1TimeSec = (uDP.ParticipantInfo[0, 8]); // Currently not working with ViewedParticipant
-                            Console.WriteLine("Sector 1 time is " + LastSector1TimeSec);
+                            LastSector1Time = (uDP.ParticipantInfo[0, 8]); // Currently not working with ViewedParticipant
+                            Console.WriteLine("Sector 1 time is " + LastSector1Time);
                             a = 0; // reset 'a'
                             PreviousSector = CurrentSector;
                         }
 
                         if (CurrentSector == 3)
                         {
-                            LastSector2TimeSec = (uDP.ParticipantInfo[0, 8]); // 
-                            Console.WriteLine("Sector 2 time is " + LastSector2TimeSec);
+                            LastSector2Time = (uDP.ParticipantInfo[0, 8]); // 
+                            Console.WriteLine("Sector 2 time is " + LastSector2Time);
                             a = 0;
                             PreviousSector = CurrentSector;
                         }
                         if (CurrentSector == 1)
                         {
-                            LastSector3TimeSec = (uDP.ParticipantInfo[0, 8]);
-                            Console.WriteLine("Sector 3 time is " + LastSector3TimeSec);
+                            LastSector3Time = (uDP.ParticipantInfo[0, 8]);
+                            Console.WriteLine("Sector 3 time is " + LastSector3Time);
                             a = 0;
-                            PreviousSector = CurrentSector;                          
+                            PreviousSector = CurrentSector;
 
                             // Current sector=1 means previous sector=3 means New lap: check invalid lap variable
                             if (CurrentLapValid == "N")
@@ -708,18 +765,18 @@ namespace pc1udp
                             else { LastLapValid = "Y"; Console.WriteLine("Last lap was valid"); }
                             CurrentLapValid = "Y"; // Reset CurrentLapValid because of new lap
                         }
-                        
+
                         //****************************
                         // SENDING LAPTIME TO DATABASE
                         //****************************
                         // Check if we need to update db
-                        LastLapTimeSec = uDP.LastLapTime; // lap time in seconds
-                        OldFastestLapTimeSec = FastestLapTimeSec; // Store the previous fastest lap in session
-                        FastestLapTimeSec = uDP.BestLapTime;    // Retrieve fastest lap in session                 
+                        LastLapTime = uDP.LastLapTime; // lap time in seconds
+                        OldFastestLapTime = FastestLapTime; // Store the previous fastest lap in session
+                        FastestLapTime = uDP.BestLapTime;    // Retrieve fastest lap in session                 
 
                         // Is it a new session lap record? 
-                        if (OldFastestLapTimeSec <= 0) { OldFastestLapTimeSec = 9999999999; } // if no record exists, set to 9999999999 to avoid null issues
-                        if (LastLapTimeSec < OldFastestLapTimeSec)
+                        if (OldFastestLapTime <= 0) { OldFastestLapTime = 9999999999; } // if no record exists, set to 9999999999 to avoid null issues
+                        if (LastLapTime < OldFastestLapTime)
                         {
                             SessionLapRecord = "Y";
                             //Console.WriteLine("NEW SESSION RECORD");
@@ -728,12 +785,12 @@ namespace pc1udp
                         { SessionLapRecord = "N"; }
 
                         // Check if it's a new lap that should be sent to db
-                        if (LastLapTimeSec > 0 && OldLapTimeSec != LastLapTimeSec && SessionState != "Formation Lap")  //Excluding formation laps (untested). Should check for in/out laps too.
+                        if (LastLapTime > 0 && OldLapTimeSec != LastLapTime && SessionState != "Formation Lap")  //Excluding formation laps (untested). Should check for in/out laps too.
                         {
                             dbFetchRecord(); //get lap records from db
                             if (dbLapRecord <= 0) { dbLapRecord = 99999999999; }   // if no record exists in db, set to 9999999999 to avoid null issues
                             // Is it an All Time Record?
-                            if (LastLapTimeSec < dbLapRecord)
+                            if (LastLapTime < dbLapRecord)
                             {
                                 if (LastLapValid == "Y")
                                 {
@@ -752,6 +809,7 @@ namespace pc1udp
                                 if (LastLapValid == "Y" && SessionState == "Time Trial") // Only send valid laps in TT to db
                                 {
                                     dbSendLapToDb(); // Send the lap to MariaDB
+                                    //SendLapToAzure(); // Send lap to Azure
                                     Console.WriteLine("TT and valid");
                                     Console.WriteLine("Last lap valid: " + LastLapValid);
                                 }
@@ -765,6 +823,7 @@ namespace pc1udp
                                 if (SessionState == "Time Trial") // Only send laps in TT to db, valid or invalid
                                 {
                                     dbSendLapToDb(); // Send the lap to MariaDB
+                                    //SendLapToAzure(); // Send lap to Azure
                                     Console.WriteLine("TT");
                                 }
                                 else
@@ -777,6 +836,7 @@ namespace pc1udp
                                 if (LastLapValid == "Y") // Only send valid laps to db in any game mode
                                 {
                                     dbSendLapToDb(); // Send the lap to MariaDB
+                                    //SendLapToAzure(); // Send lap to Azure
                                     Console.WriteLine("Valid");
                                 }
                                 else
@@ -787,19 +847,20 @@ namespace pc1udp
                             if (validlapsonly == "N" && timetrialonly == "N") // Check user settings (settings.php, table 'settings')
                             {
                                 dbSendLapToDb(); Console.WriteLine("All laps");  // if validlapsonly = "N" and timetrialonly = N then send all laps to db
+                                //SendLapToAzure(); Console.WriteLine("All laps"); // Send lap to Azure
                             }
                             CurrentLapValid = "Y"; // Reset CurrentLapValid
                             CurrentLapInLap = "N"; // Reset
                             CurrentLapOutLap = "N"; // Reset
-                            OldLapTimeSec = LastLapTimeSec; // Store the last lap time in variable for later comparisons
+                            OldLapTimeSec = LastLapTime; // Store the last lap time in variable for later comparisons
                         }
-                       
+
                     } // end of 'a++'-loop
 
                 } // end of 'if sector has changed'
-                 
+
             }
-            
+
         }
     }
 }

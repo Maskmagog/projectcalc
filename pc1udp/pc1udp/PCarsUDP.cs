@@ -272,9 +272,8 @@ namespace PcarsUDP
             UnfilteredBrake = binaryReader.ReadByte();
             UnfilteredSteering = binaryReader.ReadSByte();
             UnfilteredClutch = binaryReader.ReadByte();
-            LapsInEvent = binaryReader.ReadByte();
-
             RaceStateFlags = binaryReader.ReadByte();
+            LapsInEvent = binaryReader.ReadByte();
             BestLapTime = binaryReader.ReadSingle();
             LastLapTime = binaryReader.ReadSingle();
             CurrentTime = binaryReader.ReadSingle();
@@ -296,9 +295,7 @@ namespace PcarsUDP
             WorldFastestSector1Time = binaryReader.ReadSingle();
             WorldFastestSector2Time = binaryReader.ReadSingle();
             WorldFastestSector3Time = binaryReader.ReadSingle();
-            
          
-
             Joypad = binaryReader.ReadUInt16();
 
             HighestFlag = binaryReader.ReadByte();
