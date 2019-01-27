@@ -121,51 +121,6 @@ namespace pc1udp
 
 
         //************************************
-        // Sending laps to Azure
-        //************************************
-        static void SendLapToAzure()
-        {
-
-            Console.WriteLine("Connecting to Azure...");
-            string connectionString = "Server = tcp:projectcalc.database.windows.net,1433; Initial Catalog = projectcalc; User ID = pcalcadmin; Password = A6pPTgmz5#gBkKK*310sonHq;";
-
-            string commandText = "INSERT INTO laptimes(laptime, vehicle, track, gamertag, vehicleclass, sector1, sector2, sector3, sessionmode, platform, controller, setup, lapdate) VALUES(@laptime,@vehicle, @track, @gamertag,@vehicleclass,@sector1,@sector2,@sector3,@sessionmode,@platform,@controller,@setup,@lapdate)";
-
-            using (var connection = new SqlConnection(connectionString))
-            {
-                SqlCommand command = new SqlCommand(commandText, connection);
-                command.Parameters.AddWithValue("@laptime", LastLapTime);
-                command.Parameters.AddWithValue("@vehicle", VehicleName);
-                command.Parameters.AddWithValue("@track", FullTrackLocation);
-                command.Parameters.AddWithValue("@gamertag", Name);
-                command.Parameters.AddWithValue("@vehicleclass", VehicleClass);
-                command.Parameters.AddWithValue("@sector1", LastSector1Time);
-                command.Parameters.AddWithValue("@sector2", LastSector2Time);
-                command.Parameters.AddWithValue("@sector3", LastSector3Time);
-                command.Parameters.AddWithValue("@sessionmode", SessionState);
-                command.Parameters.AddWithValue("@platform", platform);
-                command.Parameters.AddWithValue("@controller", controller);
-                command.Parameters.AddWithValue("@setup", setup);
-                command.Parameters.AddWithValue("@lapdate", DateTime.Now);
-                Console.WriteLine(Name + "-" + FullTrackLocation + "-" + VehicleName + "-" + LastLapTime + "-" + LastLapValid);
-                Console.WriteLine("***********NEW LAPTIME ADDED TO DATABASE***************");
-                Console.WriteLine("S1 = " + LastSector1Time);
-                Console.WriteLine("S2 = " + LastSector2Time);
-                Console.WriteLine("S3 = " + LastSector3Time);
-                try
-                {
-                    connection.Open();
-                    Int32 rowsAffected = command.ExecuteNonQuery();
-                    Console.WriteLine("RowsAffected: {0}", rowsAffected);
-                    Console.WriteLine("Done.");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
-        }
-        //************************************
         // Inserts new laptimes into database
         //************************************
         public static void dbSendLapToDb()
