@@ -324,7 +324,7 @@ namespace pc1udp
 
             PCars1_UDP uDP = new PCars1_UDP(listener, groupEP);             //Create an UDP object that will retrieve telemetry values from in game.
 
-            Console.WriteLine("wait for udp");
+            Console.WriteLine("Waiting for udp");
 
             //************
             // MAIN LOOP *
