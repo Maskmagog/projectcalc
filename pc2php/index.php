@@ -1,12 +1,14 @@
 <!-- ******************************************
-// Project CALC - by Martin HolmstrÃ¶m
+// Project CALC - by Martin Holmström
 // maskmagog@gmail.com
 // https://github.com/Maskmagog/projectcalc
+// Updated 190113
 //
 // Feel free to use the program(s) 
 // but don't make money on it.
 // Change/adapt/modify the code as you want
 // but keep these lines. Thank you.
+// Test 190130
 //***************************************** -->
 <?php
 session_start(); // Start php session to keep session variables
@@ -211,8 +213,9 @@ if (!empty($_GET['classelect'])) {
 
 // Buttons for selecting AllTopTimes, TopPersonalTimes or AllPersonalTimes (in different div tags)						
 echo "<div class='button1'><button name='lbselect' type='submit' value='AllTopTimes'>Show leaderboard</button></div>
-<div class='button2'><button name='lbselect' type='submit' value='TopPersonalTimes'>Top personal times</button>
-<button name='lbselect' type='submit' value='AllPersonalTimes'>All personal times</button></form></div>";
+<div class='button2'><button name='lbselect' type='submit' value='TopPersonalTimes' title='Your best times at selected track'>Top personal times</button>
+<button name='lbselect' type='submit' value='AllPersonalTimes' title='All your laps with selected car/track'>All personal times</button>
+<button name='lbselect' type='submit' value='TopTimesPerCar' title='Top times per car at selected track'>Top times per car</button></form></div>";
 
 //************************
 // Search for playername * 
@@ -245,6 +248,9 @@ switch($_REQUEST['lbselect']) {
 	case 'AllPersonalTimes':
 	$personalonly = $username; //  personal leaderboards requested, add player name
 		break;
+	case 'TopTimesPerCar': 
+	$personalonly = "%%";  //  personal leaderboards not requested, add wildcards
+		break;
 }
 
 //*************	
@@ -252,6 +258,13 @@ switch($_REQUEST['lbselect']) {
 //*************
 // Get total number of rows for selected leaderboard: Prepare sql statement, bind parameters, fetch data
 // Player gamertag is stored in table user with id=1. Set from pc2udp script, which reads the gamertag from UDP
+
+switch($_REQUEST['lbselect']) {
+
+// Case normal leaderboard
+case 'AllTopTimes': // Button Show Leaderboard is pressed = show normal leaderboard
+case 'TopPersonalTimes':
+case 'AllPersonalTimes':
 $query = "SELECT t1.* FROM laptimes t1
 JOIN (
 SELECT gamertag, track, vehicle, vehicleclass, MIN(laptime) AS min_laptime
@@ -266,6 +279,26 @@ $stmt->execute();
 $stmt->store_result();
 $total_rows = $stmt->num_rows;
 $stmt->close();
+break;
+
+// Case TopTimesPerCar
+case 'TopTimesPerCar':
+$query = "SELECT t1.* FROM laptimes t1
+JOIN (
+SELECT gamertag, track, vehicle, vehicleclass, MIN(laptime) AS min_laptime
+FROM laptimes 
+WHERE track = ?  
+GROUP BY vehicle
+) AS t2 ON t1.gamertag = t2.gamertag AND t1.laptime = t2.min_laptime AND t1.track = t2.track AND t1.vehicle = t2.vehicle AND t1.vehicleclass = t2.vehicleclass
+ORDER BY laptime ASC";
+$stmt = $mysqli->prepare($query);
+$stmt->bind_param("s",$trackselect); 
+$stmt->execute();
+$stmt->store_result();
+$total_rows = $stmt->num_rows;
+$stmt->close();
+break;
+}
 
 // Setup vars for pagination query. 
 $targetpage = "index.php"; 	//your file name  (the name of this file)
@@ -280,6 +313,11 @@ else
 //*****************
 // Finding player *
 //*****************
+// Switch on $lbselect, to see what SELECT to use
+switch($_REQUEST['lbselect']) {
+	case 'AllTopTimes':
+	case 'TopPersonalTimes':
+	case 'AllPersonalTimes':
 $stmt = $mysqli->prepare("SELECT t1.* FROM laptimes t1
 JOIN (
 SELECT gamertag, track, vehicle, vehicleclass, MIN(laptime) AS min_laptime
@@ -290,7 +328,25 @@ GROUP BY gamertag, vehicle
 ORDER BY laptime ASC"); 
 $stmt->bind_param("sss",$trackselect,$carselect,$classelect); //s is for string
 $stmt->execute();
-$result = $stmt->get_result();	
+$result = $stmt->get_result();
+	break;
+
+	case 'TopTimesPerCar':
+$stmt = $mysqli->prepare("SELECT t1.* FROM laptimes t1
+JOIN (
+SELECT gamertag, track, vehicle, vehicleclass, MIN(laptime) AS min_laptime
+FROM laptimes 
+WHERE track = ?  
+GROUP BY vehicle
+) AS t2 ON t1.gamertag = t2.gamertag AND t1.laptime = t2.min_laptime AND t1.track = t2.track AND t1.vehicle = t2.vehicle AND t1.vehicleclass = t2.vehicleclass
+ORDER BY laptime ASC LIMIT ? OFFSET ?");
+		$stmt->bind_param("sii", $trackselect,$limit,$offset); //s is for string, i integer
+		$stmt->execute();
+$result = $stmt->get_result();
+	break;
+	
+}	
+		
 $oldplayerrecord = $playerrecord; // Store old lap record before fetching possibly new record
 while ($row = $result->fetch_assoc()) {
 	$a++; // variable to keep count of rows
@@ -318,7 +374,7 @@ $lbselect = $_REQUEST['lbselect'];
 if ($carselect == "%%") {$bestifalltoptimes = " best";}
 	else {$bestifalltoptimes = "";}
 // Only show player position if it exists
-if ($playerrow != "" AND $lbselect=='AllTopTimes') {
+if (($playerrow != "") AND ($lbselect=='AllTopTimes' || $lbselect=='TopTimesPerCar')) {
 	$pospercent = CEIL(($playerrow/$total_rows)*100);  // Calculate what top % player is in
 	echo "<div class='position'>Your" . $bestifalltoptimes . " time: <strong>" . convertTo($playerrecord) . "</strong>. Your" . $bestifalltoptimes . " position: <strong>{$playerrow}</strong> out of <strong>{$total_rows}</strong>. Top {$pospercent}% ";
 	// Only show link to player page if it's not on first page
@@ -373,6 +429,19 @@ ORDER BY laptime ASC LIMIT ? OFFSET ?");
 		$stmt = $mysqli->prepare("SELECT * FROM laptimes WHERE track = ? AND vehicle LIKE ? AND vehicleclass LIKE ? AND gamertag LIKE ? ORDER BY laptime ASC LIMIT ? OFFSET ?");
 		$stmt->bind_param("ssssii", $trackselect,$carselect,$classelect,$username,$limit,$offset); //s is for string
 				break;
+				
+	case 'TopTimesPerCar': // Button Show TopTimesPerCar is pressed 
+		$personalonly = "%%";
+		$stmt = $mysqli->prepare("SELECT t1.* FROM laptimes t1
+JOIN (
+SELECT gamertag, track, vehicle, vehicleclass, MIN(laptime) AS min_laptime
+FROM laptimes 
+WHERE track = ?  
+GROUP BY vehicle
+) AS t2 ON t1.gamertag = t2.gamertag AND t1.laptime = t2.min_laptime AND t1.track = t2.track AND t1.vehicle = t2.vehicle AND t1.vehicleclass = t2.vehicleclass
+ORDER BY laptime ASC LIMIT ? OFFSET ?");
+		$stmt->bind_param("sii", $trackselect,$limit,$offset); //s is for string, i integer
+                break;			
 }
 //*************************
 // Go to Racing Mode Page *
@@ -510,7 +579,7 @@ while ($row = $result->fetch_assoc())
 	$rank = $x + $offset; //offset used for pagination
 	
 // Check if it's the playerrow, or podium row	
-if ($row['gamertag'] == $username && $lbselect == 'AllTopTimes') {$class='player';} // Set row with player name to class="player' if it's on normal leaderboard	
+if (($row['gamertag'] == $username) && ($lbselect == 'AllTopTimes' || $lbselect== 'TopTimesPerCar')) {$class='player';} // Set row with player name to class="player' if it's on normal leaderboard	
 if ($rank == 1) {$class='gold'; } // $trophy="<img width='20' height='10' src=gold.png>";
 if ($rank == 2) {$class='silver';}
 if ($rank == 3) {$class='bronze';}
@@ -521,6 +590,8 @@ echo "<td>" . $rank . ". $trophy</td>";
 echo "<td><a href='player.php?player=" . $row['gamertag'] . "'>" . $row['gamertag'] . "</a></td>"; // link to players complete laps
 echo "<td><a href='index.php?trackselect={$trackselect}&carselect={$row['vehicle']}&lbselect=AllTopTimes'>" . $row['vehicle'] . "</a></td>"; // link to leaderboard for that car
 echo "<td><a href='index.php?trackselect={$trackselect}&carselect=%%&classelect={$row['vehicleclass']}&lbselect=AllTopTimes'>" . $row['vehicleclass'] . "</a></td>"; // link to leaderboard for that class
+// add check for invalid lap. Print laptime in red if invalid, black if valid, Something like:
+// if ($row['validlap'] == "N") { echo "span class='invalidlap'"; } else {echo "span class='validlap'";}
 echo "<td><span class='tooltip'>" . convertTo($row['laptime']) . "<span class='tooltiptext'>S1: " . convertTo($row['sector1']) . " S2: " . convertTo($row['sector2']) . " S3: " . convertTo($row['sector3']) . "</span></span></td>"; /*convertTo-function formats time 00:00.000 */
 $lapTime = ($row['laptime']);
 if ($rank == 1) {$_SESSION['topTime'] = $lapTime;} // $rank=1 means it's the toptime, save it in Session variable, to calculate GAP on other pages 
@@ -536,7 +607,7 @@ echo "</tbody></table>";
 //*********************
 // Display pagination *
 //*********************
-if ($lbselect == "AllTopTimes") // Only show pagination buttons on normal leaderboard, not on personal
+if (($lbselect == "AllTopTimes") || ($lbselect == "TopTimesPerCar")) // Only show pagination buttons on normal leaderboard, not on personal
 {
 echo $pagination;
 }

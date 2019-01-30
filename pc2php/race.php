@@ -2,11 +2,13 @@
 // Project CALC - by Martin Holmström
 // maskmagog@gmail.com
 // https://github.com/Maskmagog/projectcalc
+// Updated 190113
 //
 // Feel free to use the program(s) 
 // but don't make money on it.
 // Change/adapt/modify the code as you want
 // but keep these lines. Thank you.
+// Test 190130
 //***************************************** -->
 <?php
 session_start();?> 
@@ -252,9 +254,9 @@ for ($i = 0; $i < $_SESSION['rivalnr']; $i++){
 	else {$rivaldiff[$i] = $rivalrecord[$i]-$playerrecord;}
 }
 
-// Replace accented characters not supported by fontŚWIę
-$search  = array('Á','À','É','È','Ú','Ó','Ò','Å','Ä','Ö','Ê','Ñ','ö','å','ä','é','è','á','à','ú','ó','Ś','ę'); // Characters to look for
-$replace = array('A','A','E','E','U','O','O','A','A','O','E','N','O','A','A','E','E','A','A','U','O','S','E'); //Replace with these
+// Replace accented characters not supported by font
+$search  = array('Á','À','É','È','Ú','Ó','Ò','Å','Ä','Ö','Ê','Ñ','ö','å','ä','é','è','á','à','ú','ó','Ś','ę','Ë'); // Characters to look for
+$replace = array('A','A','E','E','U','O','O','A','A','O','E','N','O','A','A','E','E','A','A','U','O','S','E','E'); //Replace with these
 
 //Replace in rival names
 for ($i = 0; $i < $_SESSION['rivalnr']; $i++){	
@@ -284,7 +286,7 @@ if (($playerrow) <= ($_SESSION['rivalnr'] + 1) AND $playerrow != 1) // If there'
 }
 
 // Check if player has WR
-if ($playerrow == 1)
+if ($playerrow == 1 AND $playerrecord > 0)
 {
 	$_SESSION['rivalnr'] = 3;
 	$_SESSION['rival'][0] = "W O R L D";
