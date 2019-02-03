@@ -343,7 +343,7 @@ def main():
 	customvehicles = {
 # ,("Acura NSX","728234598","Road C")
  ("Acura NSX GT3","3416883430","GT3")
-("Agajanian Watson Roadster","2851776933","V Indy")
+,("Agajanian Watson Roadster","2851776933","V Indy")
 # ,("Aston Martin DB11","2991153806","Road D")
  ,("Aston Martin DBR1/300","4203152210","VGT C")
 # ,("Aston Martin Vantage GT12","1268015922","Road C")
@@ -422,7 +422,7 @@ def main():
  ,("Ford Escort RS1600","1639105598","Road G") 
 # ,("Ford Escort RS1600 (Rallycross)","2498018106","V RX") 
 # ,("Ford F-150 RTR Ultimate Funhaver","2746026001","Road G") 
- ("Ford Falcon FG V8 Supercar","1357515789","V8") 
+ ,("Ford Falcon FG V8 Supercar","1357515789","V8") 
 # ,("Ford Focus RS RX","647968520","WRX") 
 # ,("Ford Fusion Stockcar","851491257","Stockcar") 
 # ,("Ford GT","366881611","Road B") 
