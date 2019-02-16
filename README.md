@@ -1,7 +1,7 @@
 # projectcalc
 Project Cars 2 personal leaderboards for consoles. Receives UDP from game, and scrapes Steam leaderboards.
 
-Easiest way to get this: Get a Raspberry Pi, download compressed image file from here: https://www.dropbox.com/s/y4nv2lah27psxml/projectcalc_190113.img?dl=0
+Easiest way to get this: Get a Raspberry Pi, download compressed image file from here: https://www.dropbox.com/s/i1wol7hvenqho7j/pcalc_190212.rar?dl=0
 Write image file to sdhc card, and boot the Pi. Must be on same network as Xbox or PS4 running Project CARS 2.
 
 Project CALC - Community Assisted Leaderboards for Console
@@ -14,6 +14,7 @@ This runs on the Pi:
 •apache2 web server and php page that displays everything
 •Python script that scrapes the cars2-stats-steam page and stores all times in the database
 
+If you want to install everything yourself:
 On the Pi you need to install php7, MariaDB, Apache2, Mono.
 To edit the UDP program, you need Visual Studio.
 
