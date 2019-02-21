@@ -435,8 +435,8 @@ namespace pc1udp
                     if (VehicleName == "Honda24Concept") { VehicleName = "Honda 2&4 Concept"; }
                     if (VehicleName == "Mercedes-AMG A 45 SMS-R Touring") { VehicleName = "Mercedes-AMG A 45 SMS-R Touring"; }
                     if (VehicleName == "Opel Astra TCR") { VehicleName = "Opel Astra TCR"; }
-                    if (VehicleName == "McLarenP1GTR") { VehicleName = "McLaren P1 GTR"; }
-                    if (VehicleName == "McLarenP1") { VehicleName = "McLaren P1"; }
+                    if (VehicleName == "McLarenP1GTR") { VehicleName = "McLaren P1 GTR"; }
+                    if (VehicleName == "McLarenP1") { VehicleName = "McLaren P1"; }
                     if (VehicleName == "Ginetta G40 GT5") { VehicleClass = "GT5"; }
                 }
 
