@@ -2,13 +2,12 @@
 // Project CALC - by Martin Holmström
 // maskmagog@gmail.com
 // https://github.com/Maskmagog/projectcalc
-// Updated 190113
 //
 // Feel free to use the program(s) 
 // but don't make money on it.
 // Change/adapt/modify the code as you want
 // but keep these lines. Thank you.
-// Test 190130
+// Test 190221
 //***************************************** -->
 <?php
 session_start(); // Start php session to keep session variables
