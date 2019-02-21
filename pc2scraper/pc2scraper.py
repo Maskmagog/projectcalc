@@ -5,7 +5,6 @@
 # Project CALC - by Martin Holmström
 # maskmagog@gmail.com
 # https://github.com/Maskmagog/projectcalc
-# Updated 190113
 #
 # Scraper by Jonas Gulle
 # Modified by Martin Holmström
@@ -13,7 +12,6 @@
 # but don't make money on it.
 # Change/adapt/modify the code as you want
 # but keep these lines. Thank you.
-# Test 190128
 # ******************************************
 
 from bs4 import BeautifulSoup, Tag
