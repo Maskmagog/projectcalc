@@ -346,7 +346,7 @@ def main():
  ,("Aston Martin DBR1/300","4203152210","VGT C")
 # ,("Aston Martin Vantage GT12","1268015922","Road C")
 # ,("Aston Martin Vantage GT3","1452261378","GT3")
-# ,("Aston Martin Vantage GT4","2086246081","GT4")
+ ,("Aston Martin Vantage GT4","2086246081","GT4")
  ,("Aston Martin Vantage GTE","1401532035","GTE")
 # ,("Aston Martin Vulcan","1682144078","Track A")
  ,("Audi 90 quattro IMSA GTO","1470929381","GTO")

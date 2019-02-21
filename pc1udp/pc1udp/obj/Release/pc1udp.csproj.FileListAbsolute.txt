@@ -10,3 +10,16 @@ C:\Users\marti\Documents\Dropbox\Project Cars 2\Project CALC\pc1udp\pc1udp\pc1ud
 C:\Users\marti\Documents\Dropbox\Project Cars 2\Project CALC\pc1udp\pc1udp\pc1udp\obj\Release\pc1udp.csproj.CopyComplete
 C:\Users\marti\Documents\Dropbox\Project Cars 2\Project CALC\pc1udp\pc1udp\pc1udp\obj\Release\pc1udp.exe
 C:\Users\marti\Documents\Dropbox\Project Cars 2\Project CALC\pc1udp\pc1udp\pc1udp\obj\Release\pc1udp.pdb
+C:\Users\marti\Documents\Dropbox\Project Cars 2\Project CALC\pc1udp\pc1udp\bin\Release\pc1udp.exe.config
+C:\Users\marti\Documents\Dropbox\Project Cars 2\Project CALC\pc1udp\pc1udp\bin\Release\pc1udp.exe
+C:\Users\marti\Documents\Dropbox\Project Cars 2\Project CALC\pc1udp\pc1udp\bin\Release\pc1udp.pdb
+C:\Users\marti\Documents\Dropbox\Project Cars 2\Project CALC\pc1udp\pc1udp\bin\Release\Google.Protobuf.dll
+C:\Users\marti\Documents\Dropbox\Project Cars 2\Project CALC\pc1udp\pc1udp\bin\Release\MySql.Data.dll
+C:\Users\marti\Documents\Dropbox\Project Cars 2\Project CALC\pc1udp\pc1udp\bin\Release\System.Data.SqlClient.dll
+C:\Users\marti\Documents\Dropbox\Project Cars 2\Project CALC\pc1udp\pc1udp\bin\Release\Google.Protobuf.xml
+C:\Users\marti\Documents\Dropbox\Project Cars 2\Project CALC\pc1udp\pc1udp\bin\Release\MySql.Data.xml
+C:\Users\marti\Documents\Dropbox\Project Cars 2\Project CALC\pc1udp\pc1udp\obj\Release\pc1udp.csprojAssemblyReference.cache
+C:\Users\marti\Documents\Dropbox\Project Cars 2\Project CALC\pc1udp\pc1udp\obj\Release\pc1udp.csproj.CoreCompileInputs.cache
+C:\Users\marti\Documents\Dropbox\Project Cars 2\Project CALC\pc1udp\pc1udp\obj\Release\pc1udp.csproj.CopyComplete
+C:\Users\marti\Documents\Dropbox\Project Cars 2\Project CALC\pc1udp\pc1udp\obj\Release\pc1udp.exe
+C:\Users\marti\Documents\Dropbox\Project Cars 2\Project CALC\pc1udp\pc1udp\obj\Release\pc1udp.pdb
