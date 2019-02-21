@@ -5,7 +5,6 @@
 # Project CALC - by Martin Holmström
 # maskmagog@gmail.com
 # https://github.com/Maskmagog/projectcalc
-# Updated 190113
 #
 # Scraper by Jonas Gulle
 # Modified by Martin Holmström
@@ -13,7 +12,6 @@
 # but don't make money on it.
 # Change/adapt/modify the code as you want
 # but keep these lines. Thank you.
-# Test 190128
 # ******************************************
 
 from bs4 import BeautifulSoup, Tag
@@ -144,7 +142,7 @@ class ProjectCARS2(object):
 		return sorted(leaderboard, key=itemgetter("time"))
 		
 	def store_leaderboard(self,lb):
-	# In database, create unique_index(track,carname,player,laptime) to stop from inserting duplicates, thanks to INSERT IGNORE
+	# In database, create unique_index(track,carname,date,laptime) to stop from inserting duplicates, thanks to INSERT IGNORE
 		sql = "INSERT IGNORE INTO laptimes (track, gamertag, laptime, vehicle, vehicleclass, sessionmode, lapdate, sector1, sector2, sector3, platform, setup, controller, camera) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 		for row in lb:
 			# Get sector times in seconds
