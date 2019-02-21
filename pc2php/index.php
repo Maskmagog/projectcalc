@@ -66,17 +66,11 @@ $_SESSION['classelect'] = $classelect;
 //*********************************************** 
 function convertTo($init)
 {
-	//echo " init1 is " . $init;
-     $init  = number_format($init, 3);
-	// echo " init2 is " . $init;
+	$init  = number_format($init, 3);
     $secs  = floor($init);
-	// echo " secs is " . $secs;
     $milli = (($init - $secs) * 1000);
-	//echo " milli1 is " . $milli;
-	$milli=round($milli);
-	// echo " milli2 is " . $milli;
+	$milli = round($milli);
     $milli = str_pad($milli, 3, '0', STR_PAD_LEFT);
-    // echo " milli3 is " . $milli;
     $hours   = ($secs / 3600);
     $minutes = (($secs / 60) % 60);
     $minutes = str_pad($minutes, 2, '0', STR_PAD_LEFT);
