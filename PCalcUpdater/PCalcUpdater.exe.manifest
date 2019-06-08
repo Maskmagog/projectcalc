@@ -55,14 +55,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="PCalcUpdater.exe" size="365992">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="PCalcUpdater.exe" size="366504">
       <assemblyIdentity name="PCalcUpdater" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>Hl/fOTrzXDP0THQFdg7ziwPVqqgIDL8iqEtJUZSxXQ8=</dsig:DigestValue>
+        <dsig:DigestValue>+e6JNphgfI8DK2K6+o7CHTXnI184EgWpmHfkgQOt05o=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
