@@ -9,14 +9,14 @@
     <framework targetVersion="4.6.1" profile="Full" supportedRuntime="4.0.30319" />
   </compatibleFrameworks>
   <dependency>
-    <dependentAssembly dependencyType="install" codebase="PCalcUpdater.exe.manifest" size="5989">
+    <dependentAssembly dependencyType="install" codebase="PCalcUpdater.exe.manifest" size="5987">
       <assemblyIdentity name="PCalcUpdater.exe" version="0.5.4.6" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>7741Wgx4mb4MwXhVke0aRH/LvLtagQcDnxOq7jbonhg=</dsig:DigestValue>
+        <dsig:DigestValue>Mp2RZPV0ro0YjYx1E1EZMMMRN4V3Kv/Fq4uSGskg9A8=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
