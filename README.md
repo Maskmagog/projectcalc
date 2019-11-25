@@ -5,6 +5,8 @@ Project Cars 2 personal leaderboards for consoles. Receives UDP from game, and s
 UPDATE: Database, python scripts and php moved to a server, https://projectcalc.org. All that's needed now is the files in PCalcUpdater folder. Runs on both Raspberry Pi (with Mono) or Windows.
 --------------------
 
+***Info below is obsolete. It's only needed if you want to run your own database locally. ***
+
 Easiest way to get this: Get a Raspberry Pi, download compressed image file from here: https://www.dropbox.com/s/i1wol7hvenqho7j/pcalc_190212.rar?dl=0
 Write image file to sdhc card, and boot the Pi. Must be on same network as Xbox or PS4 running Project CARS 2.
 
